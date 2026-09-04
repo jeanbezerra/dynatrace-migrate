@@ -19,6 +19,7 @@ jobs:
       version_tag: ${{ steps.metadata.outputs.version_tag }}
       artifact_name: ${{ steps.metadata.outputs.artifact_name }}
       executable_name: ${{ steps.metadata.outputs.executable_name }}
+      signed: ${{ steps.certificate.outputs.enabled }}
     steps:
       - name: Obter o código
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -74,16 +75,30 @@ jobs:
             --configuration Release `
             --no-build
 
-      - name: Importar certificado de assinatura
+      - name: Preparar assinatura opcional
         id: certificate
         shell: pwsh
         env:
           CERTIFICATE_BASE64: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE_BASE64 }}
           CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE_PASSWORD }}
         run: |
-          if ([string]::IsNullOrWhiteSpace($env:CERTIFICATE_BASE64) -or
-              [string]::IsNullOrWhiteSpace($env:CERTIFICATE_PASSWORD)) {
-            throw 'Configure os secrets WINDOWS_SIGNING_CERTIFICATE_BASE64 e WINDOWS_SIGNING_CERTIFICATE_PASSWORD no environment release.'
+          $hasCertificate = -not [string]::IsNullOrWhiteSpace($env:CERTIFICATE_BASE64)
+          $hasPassword = -not [string]::IsNullOrWhiteSpace($env:CERTIFICATE_PASSWORD)
+
+          if (-not $hasCertificate -and -not $hasPassword) {
+            'enabled=false' >> $env:GITHUB_OUTPUT
+            Write-Warning 'Certificado não configurado. O EXE será publicado sem assinatura Authenticode.'
+            @(
+              '## Assinatura Authenticode'
+              ''
+              'O executável foi publicado sem assinatura. O Windows pode exibir um'
+              'aviso do SmartScreen ou bloquear o arquivo conforme a política local.'
+            ) -join "`n" | Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Encoding utf8
+            exit 0
+          }
+
+          if (-not $hasCertificate -or -not $hasPassword) {
+            throw 'Configure os dois secrets de assinatura ou remova ambos para usar o modo gratuito sem assinatura.'
           }
 
           $certificatePath = Join-Path $env:RUNNER_TEMP 'a2d-code-signing.pfx'
@@ -109,6 +124,7 @@ jobs:
               throw 'O PFX não contém um certificado Code Signing com chave privada.'
             }
 
+            'enabled=true' >> $env:GITHUB_OUTPUT
             "thumbprint=$($certificate.Thumbprint)" >> $env:GITHUB_OUTPUT
           }
           finally {
@@ -117,19 +133,25 @@ jobs:
             }
           }
 
-      - name: Publicar e assinar o executável
+      - name: Publicar o executável
         shell: pwsh
         env:
           TIMESTAMP_URL: ${{ vars.WINDOWS_TIMESTAMP_URL || 'http://timestamp.digicert.com' }}
         run: |
           $publishPath = Join-Path '${{ runner.temp }}' 'a2d-exe-publish'
-          ./scripts/publish-win-x64.ps1 `
-            -Configuration Release `
-            -OutputPath $publishPath `
-            -Version '${{ steps.metadata.outputs.version }}' `
-            -CertificateThumbprint '${{ steps.certificate.outputs.thumbprint }}' `
-            -TimestampUrl $env:TIMESTAMP_URL `
-            -RequireSignature
+          $publishParameters = @{
+            Configuration = 'Release'
+            OutputPath = $publishPath
+            Version = '${{ steps.metadata.outputs.version }}'
+          }
+
+          if ('${{ steps.certificate.outputs.enabled }}' -eq 'true') {
+            $publishParameters.CertificateThumbprint = '${{ steps.certificate.outputs.thumbprint }}'
+            $publishParameters.TimestampUrl = $env:TIMESTAMP_URL
+            $publishParameters.RequireSignature = $true
+          }
+
+          ./scripts/publish-win-x64.ps1 @publishParameters
 
           $releasePath = Join-Path '${{ runner.temp }}' 'a2d-exe-release'
           New-Item -ItemType Directory -Path $releasePath -Force | Out-Null
@@ -139,7 +161,7 @@ jobs:
             -Force
 
       - name: Remover certificado do runner
-        if: always() && steps.certificate.outputs.thumbprint != ''
+        if: always() && steps.certificate.outputs.enabled == 'true'
         shell: pwsh
         run: |
           $path = 'Cert:\CurrentUser\My\${{ steps.certificate.outputs.thumbprint }}'
@@ -163,7 +185,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Baixar o executável assinado
+      - name: Baixar o executável
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
         with:
           name: ${{ needs.package.outputs.artifact_name }}
@@ -176,18 +198,26 @@ jobs:
           VERSION: ${{ needs.package.outputs.version }}
           VERSION_TAG: ${{ needs.package.outputs.version_tag }}
           EXECUTABLE_NAME: ${{ needs.package.outputs.executable_name }}
+          SIGNED: ${{ needs.package.outputs.signed }}
         run: |
           set -euo pipefail
           asset="release-assets/$EXECUTABLE_NAME"
           test -f "$asset"
 
+          if [[ "$SIGNED" == 'true' ]]; then
+            signature_note='Assinatura Authenticode: presente e validada.'
+          else
+            signature_note='Assinatura Authenticode: ausente. O Windows pode exibir um aviso ou bloquear o arquivo.'
+          fi
+
           if gh release view "$VERSION_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$VERSION_TAG" "$asset" --clobber --repo "$GITHUB_REPOSITORY"
+            gh release edit "$VERSION_TAG" --repo "$GITHUB_REPOSITORY" --notes "$signature_note"
           else
             gh release create "$VERSION_TAG" "$asset" \
               --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
-              --generate-notes \
+              --notes "$signature_note" \
               --title "A2D Alert Migrator $VERSION"
           fi
 
@@ -204,7 +234,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Baixar o executável assinado
+      - name: Baixar o executável
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
         with:
           name: ${{ needs.package.outputs.artifact_name }}
@@ -217,13 +247,20 @@ jobs:
           VERSION: ${{ needs.package.outputs.version }}
           VERSION_TAG: ${{ needs.package.outputs.version_tag }}
           EXECUTABLE_NAME: ${{ needs.package.outputs.executable_name }}
+          SIGNED: ${{ needs.package.outputs.signed }}
         run: |
           set -euo pipefail
           source_asset="release-assets/$EXECUTABLE_NAME"
           latest_asset='release-assets/A2D.AlertMigrator-latest-win-x64.exe'
           cp "$source_asset" "$latest_asset"
 
-          notes="Executável mais recente. Versão atual: [$VERSION](https://github.com/$GITHUB_REPOSITORY/releases/tag/$VERSION_TAG)."
+          if [[ "$SIGNED" == 'true' ]]; then
+            signature_note='Assinatura Authenticode: presente e validada.'
+          else
+            signature_note='Assinatura Authenticode: ausente. O Windows pode exibir um aviso ou bloquear o arquivo.'
+          fi
+
+          notes="Executável mais recente. Versão atual: [$VERSION](https://github.com/$GITHUB_REPOSITORY/releases/tag/$VERSION_TAG). $signature_note"
 
           if gh release view exe-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/exe-latest" >/dev/null 2>&1; then

@@ -6,7 +6,7 @@ executável e o MSI, gera SHA-256 e anexa os arquivos ao GitHub Release.
 
 O workflow [`release-exe.yml`](../.github/workflows/release-exe.yml) executa a
 cada push na `master` ou manualmente. Ele publica somente o executável
-autocontido e assinado em dois canais:
+autocontido em dois canais:
 
 - `exe-v1.0.N`, release histórica cuja versão usa o número da execução;
 - `exe-latest`, release móvel que sempre aponta para o último executável.
@@ -18,7 +18,7 @@ preserva o nome versionado, enquanto o canal móvel usa
 | Canal | Pacote | Assinatura final |
 |---|---|---|
 | GitHub Release ou distribuição corporativa | MSI | Certificado Code Signing do projeto |
-| GitHub Release incremental ou `exe-latest` | EXE autocontido | Certificado Code Signing do projeto |
+| GitHub Release incremental ou `exe-latest` | EXE autocontido | Opcional; depende dos secrets do projeto |
 | Microsoft Store | MSIX | Microsoft Store após a certificação |
 
 O procedimento da Store está em
@@ -64,10 +64,18 @@ Para o executável, integre o commit na `master` ou execute **Publicar EXE** em
 usa `github.run_number` para gerar a próxima versão. Uma nova execução normal
 gera uma nova versão; repetir a mesma execução atualiza a release correspondente.
 
+Sem os dois secrets de assinatura, o workflow entra automaticamente no modo
+gratuito e publica o EXE sem Authenticode. A release e o resumo da execução
+mostram esse estado. Esse modo não evita alertas do SmartScreen nem bloqueios de
+políticas corporativas. Para distribuição gratuita sem esses avisos, prefira o
+MSIX reassinado pela Microsoft Store.
+
 O empacotamento usa WiX 5.0.2 fixado no projeto. WiX 6 e 7 adotam a
 [Open Source Maintenance Fee](https://docs.firegiant.com/wix/osmf/); uma futura
 atualização deve passar por avaliação jurídica e de segurança.
 
 Referências: [segredos no GitHub Actions](https://docs.github.com/actions/security-guides/using-secrets-in-github-actions),
 [GitHub Releases](https://docs.github.com/repositories/releasing-projects-on-github/about-releases)
-e [SignTool](https://learn.microsoft.com/windows/win32/seccrypto/signtool).
+e [SignTool](https://learn.microsoft.com/windows/win32/seccrypto/signtool),
+[conta gratuita da Microsoft Store](https://learn.microsoft.com/windows/apps/publish/faq/open-developer-account)
+e [reputação do SmartScreen](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation).
