@@ -1,0 +1,114 @@
+{
+    "$schema":  "https://a2d.local/schemas/application-rules-v1.schema.json",
+    "schemaVersion":  "1.0",
+    "application":  {
+                        "id":  "sample-app-283",
+                        "name":  "Aplicação de Exemplo 283",
+                        "description":  "Aplicação sintética 283 para testes locais de migração",
+                        "owners":  [
+                                       "sre-team-07"
+                                   ],
+                        "labels":  {
+                                       "businessUnit":  "unit-3",
+                                       "environment":  "development"
+                                   }
+                    },
+    "defaults":  {
+                     "enabled":  true,
+                     "eventType":  "ERROR_EVENT",
+                     "alertGroup":  "sample-app-283",
+                     "profile":  {
+                                     "name":  "NOC - Equipe 07",
+                                     "severity":  "ERROR",
+                                     "delayMinutes":  0,
+                                     "tagFilters":  [
+                                                        "team:team-07"
+                                                    ]
+                                 },
+                     "schedule":  {
+                                      "mode":  "ACTIVE_WINDOW",
+                                      "timezone":  "America/Sao_Paulo",
+                                      "windows":  [
+                                                      {
+                                                          "days":  [
+                                                                       "MON",
+                                                                       "TUE",
+                                                                       "WED",
+                                                                       "THU",
+                                                                       "FRI"
+                                                                   ],
+                                                          "start":  "09:00",
+                                                          "end":  "18:00"
+                                                      }
+                                                  ]
+                                  }
+                 },
+    "rules":  [
+                  {
+                      "id":  "APPD-SAMPLE-283-ERROR",
+                      "name":  "Aplicação 283 - quantidade de erros",
+                      "groupId":  "sample-app-283-errors",
+                      "description":  "Quantidade de falhas acima do limite operacional",
+                      "targets":  [
+                                      {
+                                          "selectorType":  "NAME",
+                                          "value":  "sample-app-283-api"
+                                      },
+                                      {
+                                          "selectorType":  "NAME",
+                                          "value":  "sample-app-283-worker"
+                                      }
+                                  ],
+                      "signal":  {
+                                     "kind":  "METRIC",
+                                     "metricKey":  "dt.service.request.failure_count",
+                                     "aggregation":  "SUM"
+                                 },
+                      "detector":  {
+                                       "model":  "STATIC",
+                                       "condition":  "ABOVE",
+                                       "threshold":  8,
+                                       "violatingSamples":  3,
+                                       "slidingWindow":  5,
+                                       "dealertingSamples":  3,
+                                       "alertOnMissingData":  false
+                                   },
+                      "event":  {
+                                    "name":  "Aplicação 283 com erros acima do limite",
+                                    "description":  "Erros detectados nos serviços da aplicação 283."
+                                }
+                  },
+                  {
+                      "id":  "APPD-SAMPLE-283-LATENCY",
+                      "name":  "Aplicação 283 - anomalia de latência",
+                      "targets":  [
+                                      {
+                                          "selectorType":  "ENTITY_ID",
+                                          "value":  "SERVICE-000000000000011B"
+                                      }
+                                  ],
+                      "signal":  {
+                                     "kind":  "METRIC",
+                                     "metricKey":  "dt.service.request.response_time",
+                                     "aggregation":  "AVG"
+                                 },
+                      "detector":  {
+                                       "model":  "AUTO_ADAPTIVE",
+                                       "condition":  "ABOVE",
+                                       "numberOfSignalFluctuations":  1,
+                                       "violatingSamples":  3,
+                                       "slidingWindow":  5,
+                                       "dealertingSamples":  5,
+                                       "alertOnMissingData":  false
+                                   },
+                      "event":  {
+                                    "name":  "Latência anormal na aplicação 283",
+                                    "type":  "PERFORMANCE_EVENT",
+                                    "alertGroup":  "sample-app-283"
+                                },
+                      "schedule":  {
+                                       "mode":  "ALWAYS"
+                                   }
+                  }
+              ]
+}

@@ -1,0 +1,374 @@
+<Window x:Class="A2D.AlertMigrator.Desktop.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:alertingViews="clr-namespace:A2D.AlertMigrator.Desktop.Views.Alerting"
+        xmlns:alertingViewModels="clr-namespace:A2D.AlertMigrator.Desktop.ViewModels.Alerting"
+        xmlns:helpViews="clr-namespace:A2D.AlertMigrator.Desktop.Views.Help"
+        xmlns:helpViewModels="clr-namespace:A2D.AlertMigrator.Desktop.ViewModels.Help"
+        xmlns:importViews="clr-namespace:A2D.AlertMigrator.Desktop.Views.Importing"
+        xmlns:importViewModels="clr-namespace:A2D.AlertMigrator.Desktop.ViewModels.Importing"
+        xmlns:integrationViews="clr-namespace:A2D.AlertMigrator.Desktop.Views.Integrations"
+        xmlns:integrationViewModels="clr-namespace:A2D.AlertMigrator.Desktop.ViewModels.Integrations"
+        xmlns:settingsViews="clr-namespace:A2D.AlertMigrator.Desktop.Views.Settings"
+        xmlns:settingsViewModels="clr-namespace:A2D.AlertMigrator.Desktop.ViewModels.Settings"
+        Title="A2D Alert Migrator"
+        Width="1360"
+        Height="860"
+        MinWidth="1080"
+        MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type importViewModels:ImportWorkspaceViewModel}">
+            <importViews:ImportWorkspaceView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type alertingViewModels:DynatraceAlertingProfilesViewModel}">
+            <alertingViews:DynatraceAlertingProfilesView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type alertingViewModels:DynatraceAnomalyDetectorsViewModel}">
+            <alertingViews:DynatraceAnomalyDetectorsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type alertingViewModels:DynatraceDavisEventsViewModel}">
+            <alertingViews:DynatraceDavisEventsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type alertingViewModels:DynatraceProblemsViewModel}">
+            <alertingViews:DynatraceProblemsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type settingsViewModels:SettingsViewModel}">
+            <settingsViews:SettingsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type integrationViewModels:IntegrationSettingsViewModel}">
+            <integrationViews:IntegrationSettingsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type helpViewModels:DynatraceHelpViewModel}">
+            <helpViews:DynatraceHelpView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type helpViewModels:AppDynamicsHelpViewModel}">
+            <helpViews:AppDynamicsHelpView />
+        </DataTemplate>
+    </Window.Resources>
+    <Grid Background="{StaticResource ColorNeutralBackground2}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="232" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="64" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.RowSpan="2"
+                Background="{StaticResource ColorNeutralBackground1}"
+                BorderBrush="{StaticResource ColorNeutralStroke2}"
+                BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="72" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Margin="16,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="36"
+                            Height="36"
+                            CornerRadius="8"
+                            Background="{StaticResource ColorBrandBackground}">
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   Text="A2D" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock FontSize="15" FontWeight="SemiBold" Text="Alert Migrator" />
+                        <TextBlock Style="{StaticResource CaptionText}" Text="AppDynamics → Dynatrace" />
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Grid.Row="1"
+                           Margin="20,14,20,6"
+                           Style="{StaticResource CaptionText}"
+                           FontWeight="SemiBold"
+                           Text="MIGRAÇÃO" />
+
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <Button Command="{Binding NavigateImportCommand}" AutomationProperties.Name="Importar regras">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource NavigationButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsImportPage}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ColorBrandBackgroundHover}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xE8B7;" />
+                            <TextBlock Text="Importar regras" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource NavigationButton}" IsEnabled="False" AutomationProperties.Name="Revisar plano">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xE9D5;" />
+                            <TextBlock Text="Revisar plano" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource NavigationButton}" IsEnabled="False" AutomationProperties.Name="Histórico">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xE81C;" />
+                            <TextBlock Text="Histórico" />
+                        </StackPanel>
+                    </Button>
+                    <TextBlock Margin="20,18,20,6"
+                               Style="{StaticResource CaptionText}"
+                               FontWeight="SemiBold"
+                               Text="GESTÃO DE ALERTAS" />
+                    <StackPanel Margin="20,5,12,3" Orientation="Horizontal">
+                        <TextBlock Width="28"
+                                   FontFamily="Segoe Fluent Icons"
+                                   FontSize="16"
+                                   Foreground="{StaticResource ColorNeutralForeground3}"
+                                   Text="&#xE753;" />
+                        <TextBlock FontWeight="SemiBold" Text="Dynatrace" />
+                    </StackPanel>
+                    <Button Margin="28,2,8,2"
+                            Padding="12,0"
+                            Command="{Binding NavigateDynatraceAlertingProfilesCommand}"
+                            AutomationProperties.Name="Perfis de alertas de problemas do Dynatrace">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource NavigationButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDynatraceAlertingProfilesPage}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ColorBrandBackgroundHover}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xE9D5;" />
+                            <TextBlock Text="Perfis de alertas" />
+                        </StackPanel>
+                    </Button>
+                    <Button Margin="28,2,8,2"
+                            Padding="12,0"
+                            Command="{Binding NavigateDynatraceAnomalyDetectorsCommand}"
+                            AutomationProperties.Name="Regras do Anomaly Detection do Dynatrace">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource NavigationButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDynatraceAnomalyDetectorsPage}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ColorBrandBackgroundHover}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xEA39;" />
+                            <TextBlock Text="Anomaly Detection" />
+                        </StackPanel>
+                    </Button>
+                    <Button Margin="28,2,8,2"
+                            Padding="12,0"
+                            Command="{Binding NavigateDynatraceDavisEventsCommand}"
+                            AutomationProperties.Name="Eventos de alertas do Dynatrace">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource NavigationButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDynatraceDavisEventsPage}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ColorBrandBackgroundHover}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xE7C3;" />
+                            <TextBlock Text="Eventos de alertas" />
+                        </StackPanel>
+                    </Button>
+                    <Button Margin="28,2,8,2"
+                            Padding="12,0"
+                            Command="{Binding NavigateDynatraceProblemsCommand}"
+                            AutomationProperties.Name="Problemas do Dynatrace">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource NavigationButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDynatraceProblemsPage}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ColorBrandBackgroundHover}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xE783;" />
+                            <TextBlock Text="Problemas" />
+                        </StackPanel>
+                    </Button>
+                    <TextBlock Margin="20,18,20,6"
+                               Style="{StaticResource CaptionText}"
+                               FontWeight="SemiBold"
+                               Text="CONFIGURAÇÕES" />
+                    <Button Command="{Binding NavigateSettingsCommand}" AutomationProperties.Name="Configurações do aplicativo">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource NavigationButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSettingsPage}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ColorBrandBackgroundHover}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xE713;" />
+                            <TextBlock Text="Aplicativo" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NavigateDynatraceIntegrationsCommand}" AutomationProperties.Name="Ambientes Dynatrace">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource NavigationButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDynatraceIntegrationsPage}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ColorBrandBackgroundHover}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xE753;" />
+                            <TextBlock Text="Dynatrace" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NavigateAppDynamicsIntegrationsCommand}" AutomationProperties.Name="Ambientes AppDynamics">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource NavigationButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAppDynamicsIntegrationsPage}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ColorBrandBackgroundHover}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xE774;" />
+                            <TextBlock Text="AppDynamics" />
+                        </StackPanel>
+                    </Button>
+
+                    <TextBlock Margin="20,18,20,6"
+                               Style="{StaticResource CaptionText}"
+                               FontWeight="SemiBold"
+                               Text="AJUDA" />
+                    <Button Command="{Binding NavigateDynatraceHelpCommand}" AutomationProperties.Name="Ajuda do Dynatrace">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource NavigationButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDynatraceHelpPage}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ColorBrandBackgroundHover}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xE897;" />
+                            <TextBlock Text="Dynatrace" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NavigateAppDynamicsHelpCommand}" AutomationProperties.Name="Ajuda do AppDynamics">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource NavigationButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAppDynamicsHelpPage}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                                        <Setter Property="Foreground" Value="{StaticResource ColorBrandBackgroundHover}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="28" FontFamily="Segoe Fluent Icons" FontSize="16" Text="&#xE897;" />
+                            <TextBlock Text="AppDynamics" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                </ScrollViewer>
+
+                <Border Grid.Row="3"
+                        Margin="12"
+                        Padding="12"
+                        CornerRadius="8"
+                        Background="{StaticResource ColorNeutralBackground3}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Width="8"
+                                 Height="8"
+                                 Margin="0,0,10,0"
+                                 VerticalAlignment="Center"
+                                 Fill="{StaticResource ColorStatusSuccess}" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock FontSize="12" FontWeight="SemiBold" Text="Execução local" />
+                            <TextBlock Style="{StaticResource CaptionText}" Text="Sem servidor ou porta local" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="1"
+                Background="{StaticResource ColorNeutralBackground1}"
+                BorderBrush="{StaticResource ColorNeutralStroke2}"
+                BorderThickness="0,0,0,1">
+            <Grid Margin="28,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Text="Workspace local" />
+                <Border Grid.Column="1"
+                        Padding="10,4"
+                        VerticalAlignment="Center"
+                        CornerRadius="12"
+                        Background="{StaticResource ColorNeutralBackground3}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0,0,6,0" FontFamily="Segoe Fluent Icons" Text="&#xE753;" />
+                        <TextBlock FontSize="12" Text="Tenant não conectado" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <ContentControl Grid.Row="1"
+                        Grid.Column="1"
+                        Content="{Binding CurrentPage}" />
+    </Grid>
+</Window>

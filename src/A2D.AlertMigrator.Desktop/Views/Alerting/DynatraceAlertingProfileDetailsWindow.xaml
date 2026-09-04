@@ -1,0 +1,150 @@
+<Window x:Class="A2D.AlertMigrator.Desktop.Views.Alerting.DynatraceAlertingProfileDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Detalhes do perfil de alertas"
+        Width="920"
+        Height="720"
+        MinWidth="760"
+        MinHeight="560"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        ResizeMode="CanResizeWithGrip"
+        UseLayoutRounding="True">
+    <Grid Margin="24,20,24,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Style="{StaticResource CaptionText}" Text="PERFIL DE ALERTAS · CLASSIC" />
+                <TextBlock Margin="0,3,0,0"
+                           Style="{StaticResource TitleLarge}"
+                           Text="{Binding Name}"
+                           TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="20,0,0,0" Orientation="Horizontal" VerticalAlignment="Center">
+                <Ellipse Width="8" Height="8" Margin="0,0,8,0">
+                    <Ellipse.Style>
+                        <Style TargetType="Ellipse">
+                            <Setter Property="Fill" Value="{StaticResource ColorStatusSuccess}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsPresent}" Value="False">
+                                    <Setter Property="Fill" Value="{StaticResource ColorStatusWarning}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Ellipse.Style>
+                </Ellipse>
+                <TextBlock FontWeight="SemiBold" Text="{Binding PresenceText}" />
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Margin="0,0,0,14" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.1*" />
+                    <ColumnDefinition Width="1.1*" />
+                    <ColumnDefinition Width="0.7*" />
+                    <ColumnDefinition Width="0.7*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Margin="0,0,18,14">
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Escopo" />
+                    <TextBlock Margin="0,3,0,0" FontWeight="SemiBold" Text="{Binding Scope}" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="0,0,18,14">
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Zona de gerenciamento" />
+                    <TextBlock Margin="0,3,0,0" FontWeight="SemiBold" Text="{Binding ManagementZone}" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Margin="0,0,18,14">
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Regras" />
+                    <TextBlock Margin="0,3,0,0" FontSize="18" FontWeight="SemiBold" Text="{Binding SeverityRuleCount}" />
+                </StackPanel>
+                <StackPanel Grid.Column="3" Margin="0,0,0,14">
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Filtros de evento" />
+                    <TextBlock Margin="0,3,0,0" FontSize="18" FontWeight="SemiBold" Text="{Binding EventFilterCount}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,18,0">
+                    <TextBlock Style="{StaticResource CaptionText}" Text="ID remoto" />
+                    <TextBlock Margin="0,3,0,0" FontFamily="Cascadia Mono, Consolas" FontSize="12" Text="{Binding RemoteObjectId}" TextTrimming="CharacterEllipsis" ToolTip="{Binding RemoteObjectId}" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,0,18,0">
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Alterado no tenant" />
+                    <TextBlock Margin="0,3,0,0" Text="{Binding RemoteModifiedText}" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="3">
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Visto localmente" />
+                    <TextBlock Margin="0,3,0,0" Text="{Binding LastSeenText}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Padding="0" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid Margin="14,11,14,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock FontWeight="SemiBold" Text="JSON retornado pela API" />
+                        <TextBlock Margin="0,2,0,0" Style="{StaticResource CaptionText}" Text="{Binding Schema}" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Padding="10,4"
+                            Click="CopyJson_Click"
+                            AutomationProperties.Name="Copiar JSON formatado">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="0,0,6,0" FontFamily="Segoe Fluent Icons" Text="&#xE8C8;" />
+                            <TextBlock Text="Copiar JSON" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+                <TextBox Grid.Row="1"
+                         Padding="14,12"
+                         Text="{Binding FormattedJson, Mode=OneWay}"
+                         IsReadOnly="True"
+                         AcceptsReturn="True"
+                         HorizontalScrollBarVisibility="Auto"
+                         VerticalScrollBarVisibility="Auto"
+                         TextWrapping="NoWrap"
+                         VerticalContentAlignment="Top"
+                         FontFamily="Cascadia Mono, Consolas"
+                         FontSize="13"
+                         Background="#1E1E1E"
+                         Foreground="#DCDCDC"
+                         CaretBrush="White"
+                         BorderThickness="0"
+                         AutomationProperties.Name="JSON formatado do perfil" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="3" Margin="0,14,0,0">
+            <TextBlock x:Name="CopyStatus"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource CaptionText}" />
+            <Button HorizontalAlignment="Right"
+                    MinWidth="92"
+                    IsDefault="True"
+                    Click="Close_Click"
+                    Content="Fechar" />
+        </Grid>
+    </Grid>
+</Window>

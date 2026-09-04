@@ -1,0 +1,114 @@
+{
+    "$schema":  "https://a2d.local/schemas/application-rules-v1.schema.json",
+    "schemaVersion":  "1.0",
+    "application":  {
+                        "id":  "sample-app-233",
+                        "name":  "Aplicação de Exemplo 233",
+                        "description":  "Aplicação sintética 233 para testes locais de migração",
+                        "owners":  [
+                                       "sre-team-05"
+                                   ],
+                        "labels":  {
+                                       "businessUnit":  "unit-3",
+                                       "environment":  "staging"
+                                   }
+                    },
+    "defaults":  {
+                     "enabled":  true,
+                     "eventType":  "ERROR_EVENT",
+                     "alertGroup":  "sample-app-233",
+                     "profile":  {
+                                     "name":  "NOC - Equipe 05",
+                                     "severity":  "ERROR",
+                                     "delayMinutes":  0,
+                                     "tagFilters":  [
+                                                        "team:team-05"
+                                                    ]
+                                 },
+                     "schedule":  {
+                                      "mode":  "ACTIVE_WINDOW",
+                                      "timezone":  "America/Sao_Paulo",
+                                      "windows":  [
+                                                      {
+                                                          "days":  [
+                                                                       "MON",
+                                                                       "TUE",
+                                                                       "WED",
+                                                                       "THU",
+                                                                       "FRI"
+                                                                   ],
+                                                          "start":  "09:00",
+                                                          "end":  "18:00"
+                                                      }
+                                                  ]
+                                  }
+                 },
+    "rules":  [
+                  {
+                      "id":  "APPD-SAMPLE-233-ERROR",
+                      "name":  "Aplicação 233 - quantidade de erros",
+                      "groupId":  "sample-app-233-errors",
+                      "description":  "Quantidade de falhas acima do limite operacional",
+                      "targets":  [
+                                      {
+                                          "selectorType":  "NAME",
+                                          "value":  "sample-app-233-api"
+                                      },
+                                      {
+                                          "selectorType":  "NAME",
+                                          "value":  "sample-app-233-worker"
+                                      }
+                                  ],
+                      "signal":  {
+                                     "kind":  "METRIC",
+                                     "metricKey":  "dt.service.request.failure_count",
+                                     "aggregation":  "SUM"
+                                 },
+                      "detector":  {
+                                       "model":  "STATIC",
+                                       "condition":  "ABOVE",
+                                       "threshold":  18,
+                                       "violatingSamples":  3,
+                                       "slidingWindow":  5,
+                                       "dealertingSamples":  3,
+                                       "alertOnMissingData":  false
+                                   },
+                      "event":  {
+                                    "name":  "Aplicação 233 com erros acima do limite",
+                                    "description":  "Erros detectados nos serviços da aplicação 233."
+                                }
+                  },
+                  {
+                      "id":  "APPD-SAMPLE-233-LATENCY",
+                      "name":  "Aplicação 233 - anomalia de latência",
+                      "targets":  [
+                                      {
+                                          "selectorType":  "ENTITY_ID",
+                                          "value":  "SERVICE-00000000000000E9"
+                                      }
+                                  ],
+                      "signal":  {
+                                     "kind":  "METRIC",
+                                     "metricKey":  "dt.service.request.response_time",
+                                     "aggregation":  "AVG"
+                                 },
+                      "detector":  {
+                                       "model":  "AUTO_ADAPTIVE",
+                                       "condition":  "ABOVE",
+                                       "numberOfSignalFluctuations":  1,
+                                       "violatingSamples":  3,
+                                       "slidingWindow":  5,
+                                       "dealertingSamples":  5,
+                                       "alertOnMissingData":  false
+                                   },
+                      "event":  {
+                                    "name":  "Latência anormal na aplicação 233",
+                                    "type":  "PERFORMANCE_EVENT",
+                                    "alertGroup":  "sample-app-233"
+                                },
+                      "schedule":  {
+                                       "mode":  "ALWAYS"
+                                   }
+                  }
+              ]
+}

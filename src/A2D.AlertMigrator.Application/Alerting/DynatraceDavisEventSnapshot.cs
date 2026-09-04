@@ -1,0 +1,26 @@
+namespace A2D.AlertMigrator.Application.Alerting;
+
+public sealed record DynatraceDavisEventSnapshot(
+    string EventId,
+    string Name,
+    string Description,
+    string Category,
+    string Status,
+    string StatusTransition,
+    int? Severity,
+    string Provider,
+    string EventType,
+    string SourceEntityId,
+    string SourceEntityType,
+    string SettingsObjectId,
+    string SettingsSchemaId,
+    string AlertGroup,
+    string Query,
+    bool IsFrequent,
+    bool IsMergingAllowed,
+    bool IsUnderMaintenance,
+    DateTimeOffset? Timestamp,
+    DateTimeOffset? Start,
+    DateTimeOffset? End,
+    string ContentHash,
+    string RawJson);

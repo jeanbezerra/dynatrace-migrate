@@ -1,0 +1,184 @@
+<UserControl x:Class="A2D.AlertMigrator.Desktop.Views.Alerting.DynatraceDavisEventsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             MinWidth="800"
+             MinHeight="560">
+    <Grid Margin="28,22,28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Margin="0,0,0,16">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Style="{StaticResource TitleLarge}" Text="Eventos de alertas" />
+                <TextBlock Margin="0,3,0,0" Style="{StaticResource CaptionText}" Text="Grail · fetch dt.davis.events" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Margin="0,0,8,0"
+                        Command="{Binding OpenDetailsCommand}"
+                        CommandParameter="{Binding SelectedEvent}"
+                        AutomationProperties.Name="Abrir detalhes do evento selecionado">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0,0,7,0" FontFamily="Segoe Fluent Icons" Text="&#xE8A5;" />
+                        <TextBlock Text="Ver detalhes" />
+                    </StackPanel>
+                </Button>
+                <Button MinWidth="132"
+                        Command="{Binding SyncCommand}"
+                        Style="{StaticResource PrimaryButton}"
+                        AutomationProperties.Name="Consultar eventos de alertas">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0,0,7,0" FontFamily="Segoe Fluent Icons" Text="&#xE895;" />
+                        <TextBlock Text="Consultar" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Margin="0,0,0,12" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="260" />
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="0,0,14,0">
+                    <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Tenant" />
+                    <ComboBox ItemsSource="{Binding Tenants}"
+                              SelectedItem="{Binding SelectedTenant}"
+                              DisplayMemberPath="DisplayName"
+                              IsEnabled="{Binding IsNotBusy}"
+                              AutomationProperties.Name="Tenant Dynatrace" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="0,0,14,0">
+                    <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Período" />
+                    <ComboBox ItemsSource="{Binding TimeRanges}"
+                              SelectedItem="{Binding SelectedTimeRange}"
+                              DisplayMemberPath="Label"
+                              IsEnabled="{Binding IsNotBusy}"
+                              AutomationProperties.Name="Período dos eventos" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Margin="0,0,18,0">
+                    <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Pesquisar" />
+                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             AutomationProperties.Name="Pesquisar eventos" />
+                </StackPanel>
+                <StackPanel Grid.Column="3" Margin="0,20,0,0">
+                    <CheckBox Margin="0,0,0,5" IsChecked="{Binding ActiveOnly}" Content="Somente ativos" />
+                    <CheckBox IsChecked="{Binding HighPriorityOnly}" Content="Críticos e altos" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Margin="0,0,0,10" Padding="0" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1.35*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="14,10">
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Ativos" />
+                    <TextBlock Margin="0,2,0,0" FontSize="20" FontWeight="SemiBold" Text="{Binding ActiveCountText}" />
+                </StackPanel>
+                <Border Grid.Column="1" BorderBrush="{StaticResource ColorNeutralStroke2}" BorderThickness="1,0,0,0">
+                    <StackPanel Margin="16,10"><TextBlock Style="{StaticResource CaptionText}" Text="Críticos e altos" /><TextBlock Margin="0,2,0,0" FontSize="20" FontWeight="SemiBold" Text="{Binding HighPriorityCountText}" /></StackPanel>
+                </Border>
+                <Border Grid.Column="2" BorderBrush="{StaticResource ColorNeutralStroke2}" BorderThickness="1,0,0,0">
+                    <StackPanel Margin="16,10"><TextBlock Style="{StaticResource CaptionText}" Text="Em manutenção" /><TextBlock Margin="0,2,0,0" FontSize="20" FontWeight="SemiBold" Text="{Binding MaintenanceCountText}" /></StackPanel>
+                </Border>
+                <Border Grid.Column="3" BorderBrush="{StaticResource ColorNeutralStroke2}" BorderThickness="1,0,0,0">
+                    <StackPanel Margin="16,10"><TextBlock Style="{StaticResource CaptionText}" Text="Última consulta" /><TextBlock Margin="0,3,0,0" FontWeight="SemiBold" Text="{Binding LastSyncText}" /><TextBlock Style="{StaticResource CaptionText}" Text="{Binding LastResultText}" /></StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="3" Margin="0,0,0,10" Padding="10,7" CornerRadius="5">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="{StaticResource ColorNeutralBackground3}" />
+                    <Style.Triggers><DataTrigger Binding="{Binding HasError}" Value="True"><Setter Property="Background" Value="{StaticResource ColorStatusDangerBackground}" /></DataTrigger></Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <ProgressBar Width="72" Height="3" Margin="0,0,10,0" VerticalAlignment="Center" IsIndeterminate="True" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <TextBlock Grid.Column="1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Text="{Binding StatusMessage}" ToolTip="{Binding StatusMessage}" />
+                <StackPanel Grid.Column="2" Margin="10,0,0,0" Orientation="Horizontal">
+                    <TextBlock Margin="0,0,10,0" VerticalAlignment="Center" Style="{StaticResource CaptionText}" Text="{Binding VisibleCountText}" />
+                    <Button Padding="9,3" Command="{Binding CancelCommand}" Content="Cancelar" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="4" Padding="0" Style="{StaticResource Card}">
+            <DataGrid ItemsSource="{Binding EventsView}"
+                      SelectedItem="{Binding SelectedEvent}"
+                      MouseDoubleClick="EventsGrid_MouseDoubleClick"
+                      IsReadOnly="True"
+                      CanUserSortColumns="True"
+                      EnableRowVirtualization="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      AutomationProperties.Name="Davis Events armazenados">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Width="2*" Header="Evento" SortMemberPath="Name" Binding="{Binding Name}" />
+                    <DataGridTemplateColumn Width="108" Header="Severidade" SortMemberPath="Severity">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Margin="0,0,8,0" VerticalAlignment="Center">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="{StaticResource ColorNeutralForeground3}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Severity}" Value="1"><Setter Property="Fill" Value="{StaticResource ColorStatusDanger}" /></DataTrigger>
+                                                    <DataTrigger Binding="{Binding Severity}" Value="2"><Setter Property="Fill" Value="{StaticResource ColorStatusWarning}" /></DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding SeverityText}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="88" Header="Estado" SortMemberPath="IsActive">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" Margin="0,0,8,0" VerticalAlignment="Center">
+                                        <Ellipse.Style><Style TargetType="Ellipse"><Setter Property="Fill" Value="{StaticResource ColorNeutralForegroundDisabled}" /><Style.Triggers><DataTrigger Binding="{Binding IsActive}" Value="True"><Setter Property="Fill" Value="{StaticResource ColorStatusSuccess}" /></DataTrigger></Style.Triggers></Style></Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding StatusText}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Width="105" Header="Categoria" SortMemberPath="Category" Binding="{Binding Category}" />
+                    <DataGridTextColumn Width="1.4*" Header="Entidade" SortMemberPath="EntityText" Binding="{Binding EntityText}" />
+                    <DataGridTextColumn Width="142" Header="Início" SortMemberPath="EffectiveStart" Binding="{Binding StartedText}" />
+                    <DataGridTextColumn Width="1*" Header="Origem" SortMemberPath="Provider" Binding="{Binding Provider}" />
+                    <DataGridTemplateColumn Width="66">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button MinWidth="48" Height="28" Padding="8,2"
+                                        Command="{Binding DataContext.OpenDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        Content="Abrir"
+                                        AutomationProperties.Name="Abrir detalhes deste evento" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl>

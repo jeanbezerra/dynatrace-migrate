@@ -1,0 +1,114 @@
+{
+    "$schema":  "https://a2d.local/schemas/application-rules-v1.schema.json",
+    "schemaVersion":  "1.0",
+    "application":  {
+                        "id":  "sample-app-211",
+                        "name":  "Aplicação de Exemplo 211",
+                        "description":  "Aplicação sintética 211 para testes locais de migração",
+                        "owners":  [
+                                       "sre-team-07"
+                                   ],
+                        "labels":  {
+                                       "businessUnit":  "unit-1",
+                                       "environment":  "development"
+                                   }
+                    },
+    "defaults":  {
+                     "enabled":  true,
+                     "eventType":  "ERROR_EVENT",
+                     "alertGroup":  "sample-app-211",
+                     "profile":  {
+                                     "name":  "NOC - Equipe 07",
+                                     "severity":  "ERROR",
+                                     "delayMinutes":  0,
+                                     "tagFilters":  [
+                                                        "team:team-07"
+                                                    ]
+                                 },
+                     "schedule":  {
+                                      "mode":  "ACTIVE_WINDOW",
+                                      "timezone":  "America/Sao_Paulo",
+                                      "windows":  [
+                                                      {
+                                                          "days":  [
+                                                                       "MON",
+                                                                       "TUE",
+                                                                       "WED",
+                                                                       "THU",
+                                                                       "FRI"
+                                                                   ],
+                                                          "start":  "09:00",
+                                                          "end":  "18:00"
+                                                      }
+                                                  ]
+                                  }
+                 },
+    "rules":  [
+                  {
+                      "id":  "APPD-SAMPLE-211-ERROR",
+                      "name":  "Aplicação 211 - quantidade de erros",
+                      "groupId":  "sample-app-211-errors",
+                      "description":  "Quantidade de falhas acima do limite operacional",
+                      "targets":  [
+                                      {
+                                          "selectorType":  "NAME",
+                                          "value":  "sample-app-211-api"
+                                      },
+                                      {
+                                          "selectorType":  "NAME",
+                                          "value":  "sample-app-211-worker"
+                                      }
+                                  ],
+                      "signal":  {
+                                     "kind":  "METRIC",
+                                     "metricKey":  "dt.service.request.failure_count",
+                                     "aggregation":  "SUM"
+                                 },
+                      "detector":  {
+                                       "model":  "STATIC",
+                                       "condition":  "ABOVE",
+                                       "threshold":  16,
+                                       "violatingSamples":  3,
+                                       "slidingWindow":  5,
+                                       "dealertingSamples":  3,
+                                       "alertOnMissingData":  false
+                                   },
+                      "event":  {
+                                    "name":  "Aplicação 211 com erros acima do limite",
+                                    "description":  "Erros detectados nos serviços da aplicação 211."
+                                }
+                  },
+                  {
+                      "id":  "APPD-SAMPLE-211-LATENCY",
+                      "name":  "Aplicação 211 - anomalia de latência",
+                      "targets":  [
+                                      {
+                                          "selectorType":  "ENTITY_ID",
+                                          "value":  "SERVICE-00000000000000D3"
+                                      }
+                                  ],
+                      "signal":  {
+                                     "kind":  "METRIC",
+                                     "metricKey":  "dt.service.request.response_time",
+                                     "aggregation":  "AVG"
+                                 },
+                      "detector":  {
+                                       "model":  "AUTO_ADAPTIVE",
+                                       "condition":  "ABOVE",
+                                       "numberOfSignalFluctuations":  1,
+                                       "violatingSamples":  3,
+                                       "slidingWindow":  5,
+                                       "dealertingSamples":  5,
+                                       "alertOnMissingData":  false
+                                   },
+                      "event":  {
+                                    "name":  "Latência anormal na aplicação 211",
+                                    "type":  "PERFORMANCE_EVENT",
+                                    "alertGroup":  "sample-app-211"
+                                },
+                      "schedule":  {
+                                       "mode":  "ALWAYS"
+                                   }
+                  }
+              ]
+}

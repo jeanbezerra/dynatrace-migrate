@@ -1,0 +1,288 @@
+<UserControl x:Class="A2D.AlertMigrator.Desktop.Views.Importing.ImportWorkspaceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             MinWidth="800"
+             MinHeight="560">
+    <Grid Margin="28,22,28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Margin="0,0,0,18">
+            <StackPanel>
+                <TextBlock Style="{StaticResource TitleLarge}" Text="Importar regras" />
+                <TextBlock Margin="0,4,0,0"
+                           Style="{StaticResource BodyText}"
+                           Text="Leia uma pasta de aplicações JSON e revise cada regra antes de conectar ao Dynatrace." />
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Margin="0,0,0,14" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button MinWidth="142"
+                            Command="{Binding BrowseCommand}"
+                            Style="{StaticResource PrimaryButton}"
+                            AutomationProperties.Name="Selecionar pasta JSON">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="0,0,8,0" FontFamily="Segoe Fluent Icons" Text="&#xE8B7;" />
+                            <TextBlock Text="Selecionar pasta" />
+                        </StackPanel>
+                    </Button>
+
+                    <StackPanel Grid.Column="1" Margin="16,0" VerticalAlignment="Center">
+                        <TextBlock FontSize="12" FontWeight="SemiBold" Text="Origem JSON" />
+                        <TextBlock MaxWidth="560"
+                                   Style="{StaticResource CaptionText}"
+                                   Text="{Binding FolderDisplay}"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding FolderPath}" />
+                    </StackPanel>
+
+                    <CheckBox Grid.Column="2"
+                              Margin="8,0,16,0"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding Recursive}"
+                              Content="Incluir subpastas" />
+
+                    <Button Grid.Column="3"
+                            Margin="0,0,8,0"
+                            Command="{Binding ReimportCommand}"
+                            Content="Reimportar" />
+                    <Button Grid.Column="4"
+                            Command="{Binding CancelCommand}"
+                            Content="Cancelar" />
+                </Grid>
+
+                <ProgressBar Grid.Row="1"
+                             Height="3"
+                             Margin="0,14,0,0"
+                             IsIndeterminate="True"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Margin="0,0,10,0" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Aplicações" />
+                    <TextBlock Margin="0,2,0,0" FontSize="24" FontWeight="SemiBold" Text="{Binding TotalApplications}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Margin="0,0,10,0" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Válidas" />
+                    <TextBlock Margin="0,2,0,0" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource ColorStatusSuccess}" Text="{Binding ValidApplications}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2" Margin="0,0,10,0" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Regras" />
+                    <TextBlock Margin="0,2,0,0" FontSize="24" FontWeight="SemiBold" Text="{Binding RuleCount}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="3" Margin="0,0,10,0" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Avisos" />
+                    <TextBlock Margin="0,2,0,0" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource ColorStatusWarning}" Text="{Binding WarningCount}" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="4" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource CaptionText}" Text="Erros" />
+                    <TextBlock Margin="0,2,0,0" FontSize="24" FontWeight="SemiBold" Foreground="{StaticResource ColorStatusDanger}" Text="{Binding ErrorCount}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="3" MinHeight="260">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="470" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Padding="0" Style="{StaticResource Card}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="92" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid Margin="16,8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock FontSize="14" FontWeight="SemiBold" Text="Aplicações encontradas" />
+                            <TextBlock Grid.Column="1" Style="{StaticResource CaptionText}" Text="{Binding VisibleApplicationsText}" />
+                        </Grid>
+                        <Grid Grid.Row="1" Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Height="32"
+                                     Padding="9,5"
+                                     VerticalContentAlignment="Center"
+                                     AutomationProperties.Name="Pesquisar aplicações"
+                                     ToolTip="Pesquisar aplicação, ID, arquivo ou regra"
+                                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Grid.Column="1"
+                                    Margin="8,0,0,0"
+                                    Padding="10,4"
+                                    Command="{Binding SelectAllVisibleCommand}"
+                                    Content="Todos"
+                                    ToolTip="Marcar todas as aplicações válidas exibidas" />
+                            <Button Grid.Column="2"
+                                    Margin="6,0,0,0"
+                                    Padding="10,4"
+                                    Command="{Binding ClearAllVisibleCommand}"
+                                    Content="Nenhum"
+                                    ToolTip="Desmarcar todas as aplicações exibidas" />
+                        </Grid>
+                    </Grid>
+                    <DataGrid Grid.Row="1"
+                              CanUserSortColumns="True"
+                              ItemsSource="{Binding ApplicationsView}"
+                              SelectedItem="{Binding SelectedApplication}">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="Aplicação" Width="*" IsReadOnly="True" SortMemberPath="Name">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock FontWeight="SemiBold" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Style="{StaticResource CaptionText}" TextTrimming="CharacterEllipsis">
+                                                <Run Text="{Binding Id, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding SourcePath, Mode=OneWay}" />
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Regras" Width="60" Binding="{Binding RuleCount, Mode=OneWay}" IsReadOnly="True" SortMemberPath="RuleCount" />
+                            <DataGridTemplateColumn Header="Estado" Width="88" IsReadOnly="True" SortMemberPath="Status">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Margin="0,0,5,0" FontWeight="Bold" Text="{Binding StatusSymbol}" />
+                                            <TextBlock Text="{Binding Status}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Continuar?" Width="94" SortMemberPath="ShouldContinue">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox VerticalAlignment="Center"
+                                                  Content="{Binding ContinueLabel}"
+                                                  IsChecked="{Binding ShouldContinue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  IsEnabled="{Binding CanContinue}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" Padding="0" Style="{StaticResource Card}">
+                <TabControl Margin="8">
+                    <TabItem Header="Regras">
+                        <DataGrid ItemsSource="{Binding Rules}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Regra" Width="1.6*" Binding="{Binding Name, Mode=OneWay}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Sinal" Width="1.3*" Binding="{Binding Signal, Mode=OneWay}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Detector" Width="1.1*" Binding="{Binding Detector, Mode=OneWay}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Alvos" Width="86" Binding="{Binding Targets, Mode=OneWay}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Horário" Width="110" Binding="{Binding Schedule, Mode=OneWay}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Estado" Width="84" Binding="{Binding Status, Mode=OneWay}" IsReadOnly="True" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                    <TabItem Header="Diagnósticos">
+                        <DataGrid ItemsSource="{Binding Diagnostics}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Nível" Width="82" Binding="{Binding Severity, Mode=OneWay}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Código" Width="190" Binding="{Binding Code, Mode=OneWay}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Mensagem" Width="2*" Binding="{Binding Message, Mode=OneWay}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Origem" Width="1.2*" Binding="{Binding Source, Mode=OneWay}" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Local" Width="1.2*" Binding="{Binding Location, Mode=OneWay}" IsReadOnly="True" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                    <TabItem Header="Atividade">
+                        <ListBox BorderThickness="0" ItemsSource="{Binding Activity}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="4,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="66" />
+                                            <ColumnDefinition Width="56" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Style="{StaticResource CaptionText}" Text="{Binding Time}" />
+                                        <TextBlock Grid.Column="1" FontSize="11" FontWeight="SemiBold" Text="{Binding Level}" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Message}" TextWrapping="Wrap" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="4"
+                Margin="0,14,0,0"
+                Padding="14,10"
+                CornerRadius="8"
+                Background="{StaticResource ColorBrandBackgroundLight}"
+                BorderBrush="{StaticResource ColorBrandBackground}"
+                BorderThickness="1,0,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="28" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center"
+                           FontFamily="Segoe Fluent Icons"
+                           FontSize="16"
+                           Foreground="{StaticResource ColorBrandBackgroundHover}"
+                           Text="&#xE946;" />
+                <StackPanel Grid.Column="1">
+                    <TextBlock FontSize="13" FontWeight="SemiBold" Text="{Binding StatusTitle}" />
+                    <TextBlock Style="{StaticResource CaptionText}" Text="{Binding StatusMessage}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

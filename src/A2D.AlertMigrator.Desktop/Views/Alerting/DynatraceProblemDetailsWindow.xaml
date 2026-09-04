@@ -1,0 +1,90 @@
+<Window x:Class="A2D.AlertMigrator.Desktop.Views.Alerting.DynatraceProblemDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Detalhes do problema"
+        Width="960"
+        Height="740"
+        MinWidth="780"
+        MinHeight="580"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        ResizeMode="CanResizeWithGrip"
+        UseLayoutRounding="True">
+    <Grid Margin="24,20">
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+
+        <Grid Margin="0,0,0,16">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Style="{StaticResource CaptionText}" Text="PROBLEMA DAVIS" />
+                <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
+                    <TextBlock Margin="0,0,10,0" FontSize="20" FontWeight="SemiBold" Text="{Binding DisplayId}" />
+                    <TextBlock FontSize="20" FontWeight="SemiBold" Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" />
+                </StackPanel>
+                <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionText}" Text="{Binding EventId}" TextTrimming="CharacterEllipsis" ToolTip="{Binding EventId}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="20,0,0,0" Orientation="Horizontal" VerticalAlignment="Center">
+                <Ellipse Width="8" Height="8" Margin="0,0,8,0"><Ellipse.Style><Style TargetType="Ellipse"><Setter Property="Fill" Value="{StaticResource ColorNeutralForegroundDisabled}" /><Style.Triggers><DataTrigger Binding="{Binding IsActive}" Value="True"><Setter Property="Fill" Value="{StaticResource ColorStatusDanger}" /></DataTrigger></Style.Triggers></Style></Ellipse.Style></Ellipse>
+                <TextBlock FontWeight="SemiBold" Text="{Binding StatusText}" />
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Margin="0,0,0,14" Style="{StaticResource Card}">
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="1*" /><ColumnDefinition Width="1*" /><ColumnDefinition Width="1*" /><ColumnDefinition Width="1*" /></Grid.ColumnDefinitions>
+                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                <StackPanel Margin="0,0,18,14"><TextBlock Style="{StaticResource CaptionText}" Text="Categoria" /><TextBlock Margin="0,3,0,0" FontWeight="SemiBold" Text="{Binding Category}" /></StackPanel>
+                <StackPanel Grid.Column="1" Margin="0,0,18,14"><TextBlock Style="{StaticResource CaptionText}" Text="Severidade" /><TextBlock Margin="0,3,0,0" Text="{Binding SeverityText}" /></StackPanel>
+                <StackPanel Grid.Column="2" Margin="0,0,18,14"><TextBlock Style="{StaticResource CaptionText}" Text="Início" /><TextBlock Margin="0,3,0,0" Text="{Binding StartedText}" /></StackPanel>
+                <StackPanel Grid.Column="3" Margin="0,0,0,14"><TextBlock Style="{StaticResource CaptionText}" Text="Duração" /><TextBlock Margin="0,3,0,0" Text="{Binding DurationText}" /></StackPanel>
+                <StackPanel Grid.Row="1"><TextBlock Style="{StaticResource CaptionText}" Text="Usuários afetados" /><TextBlock Margin="0,3,0,0" FontSize="18" FontWeight="SemiBold" Text="{Binding AffectedUsersText}" /></StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1"><TextBlock Style="{StaticResource CaptionText}" Text="Entidades afetadas" /><TextBlock Margin="0,3,0,0" FontSize="18" FontWeight="SemiBold" Text="{Binding AffectedEntityCountText}" /></StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="2"><TextBlock Style="{StaticResource CaptionText}" Text="Eventos correlacionados" /><TextBlock Margin="0,3,0,0" FontSize="18" FontWeight="SemiBold" Text="{Binding CorrelatedEventCountText}" /></StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="3"><TextBlock Style="{StaticResource CaptionText}" Text="Em manutenção" /><TextBlock Margin="0,3,0,0" FontWeight="SemiBold" Text="{Binding MaintenanceText}" /></StackPanel>
+            </Grid>
+        </Border>
+
+        <TabControl Grid.Row="2">
+            <TabItem Header="Contexto">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{StaticResource ColorNeutralBackground1}">
+                    <StackPanel Margin="16,14">
+                        <TextBlock FontWeight="SemiBold" Text="Descrição" />
+                        <TextBlock Margin="0,6,0,18" Text="{Binding Description}" TextWrapping="Wrap" />
+                        <TextBlock FontWeight="SemiBold" Text="Causa-raiz" />
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="1.2*" /><ColumnDefinition Width="1.6*" /><ColumnDefinition Width="1*" /></Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,20,0"><TextBlock Style="{StaticResource CaptionText}" Text="Nome" /><TextBlock Margin="0,3,0,0" Text="{Binding RootCauseName}" TextWrapping="Wrap" /></StackPanel>
+                            <StackPanel Grid.Column="1" Margin="0,0,20,0"><TextBlock Style="{StaticResource CaptionText}" Text="ID" /><TextBlock Margin="0,3,0,0" Text="{Binding RootCauseId}" TextWrapping="Wrap" /></StackPanel>
+                            <StackPanel Grid.Column="2"><TextBlock Style="{StaticResource CaptionText}" Text="Tipo" /><TextBlock Margin="0,3,0,0" Text="{Binding RootCauseType}" /></StackPanel>
+                        </Grid>
+                        <TextBlock Margin="0,18,0,0" Style="{StaticResource CaptionText}" Text="Encerramento" />
+                        <TextBlock Margin="0,3,0,0" Text="{Binding EndedText}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Entidades">
+                <Grid Background="{StaticResource ColorNeutralBackground1}">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="1*" /><ColumnDefinition Width="1*" /></Grid.ColumnDefinitions>
+                    <StackPanel Margin="14"><TextBlock Margin="0,0,0,8" FontWeight="SemiBold" Text="Entidades afetadas" /><TextBox Text="{Binding AffectedEntitiesText}" IsReadOnly="True" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" VerticalContentAlignment="Top" /></StackPanel>
+                    <StackPanel Grid.Column="1" Margin="0,14,14,14"><TextBlock Margin="0,0,0,8" FontWeight="SemiBold" Text="Serviços afetados" /><TextBox Text="{Binding AffectedServicesText}" IsReadOnly="True" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" VerticalContentAlignment="Top" /></StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Eventos correlacionados">
+                <Grid Background="{StaticResource ColorNeutralBackground1}">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                    <Grid Margin="14,10"><TextBlock VerticalAlignment="Center" Style="{StaticResource CaptionText}" Text="IDs dos Davis Events agrupados neste problema." /><Button HorizontalAlignment="Right" Padding="10,4" Click="CopyEvents_Click" Content="Copiar IDs" /></Grid>
+                    <TextBox Grid.Row="1" Padding="14,12" Text="{Binding CorrelatedEventsText}" IsReadOnly="True" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" TextWrapping="NoWrap" VerticalContentAlignment="Top" FontFamily="Cascadia Mono, Consolas" FontSize="13" Background="#1E1E1E" Foreground="#DCDCDC" CaretBrush="White" BorderThickness="0" AutomationProperties.Name="Eventos correlacionados ao problema" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="JSON original">
+                <Grid Background="{StaticResource ColorNeutralBackground1}">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                    <Grid Margin="14,10"><TextBlock VerticalAlignment="Center" Style="{StaticResource CaptionText}" Text="Registro retornado por dt.davis.problems." /><Button HorizontalAlignment="Right" Padding="10,4" Click="CopyJson_Click" Content="Copiar JSON" /></Grid>
+                    <TextBox Grid.Row="1" Padding="14,12" Text="{Binding FormattedJson}" IsReadOnly="True" AcceptsReturn="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" TextWrapping="NoWrap" VerticalContentAlignment="Top" FontFamily="Cascadia Mono, Consolas" FontSize="13" Background="#1E1E1E" Foreground="#DCDCDC" CaretBrush="White" BorderThickness="0" AutomationProperties.Name="JSON formatado do problema" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <Grid Grid.Row="3" Margin="0,14,0,0"><TextBlock x:Name="CopyStatus" VerticalAlignment="Center" Style="{StaticResource CaptionText}" /><Button HorizontalAlignment="Right" MinWidth="92" IsDefault="True" Click="Close_Click" Content="Fechar" /></Grid>
+    </Grid>
+</Window>

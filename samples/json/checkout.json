@@ -1,0 +1,96 @@
+{
+  "$schema": "https://a2d.local/schemas/application-rules-v1.schema.json",
+  "schemaVersion": "1.0",
+  "application": {
+    "id": "checkout",
+    "name": "Checkout",
+    "description": "Regras migradas do AppDynamics para a aplicação Checkout",
+    "owners": ["sre-payments"],
+    "labels": {
+      "businessUnit": "payments",
+      "environment": "production"
+    }
+  },
+  "defaults": {
+    "enabled": true,
+    "eventType": "ERROR_EVENT",
+    "alertGroup": "payments-checkout",
+    "profile": {
+      "name": "NOC - Pagamentos",
+      "severity": "ERROR",
+      "delayMinutes": 0,
+      "tagFilters": ["team:payments"]
+    },
+    "schedule": {
+      "mode": "ACTIVE_WINDOW",
+      "timezone": "America/Sao_Paulo",
+      "windows": [
+        {
+          "days": ["MON", "TUE", "WED", "THU", "FRI"],
+          "start": "09:00",
+          "end": "18:00"
+        }
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "APPD-HR-1042",
+      "name": "Checkout - error count",
+      "groupId": "checkout-error-count",
+      "description": "Quantidade de falhas acima do limite operacional",
+      "targets": [
+        { "selectorType": "NAME", "value": "checkout-api" },
+        { "selectorType": "NAME", "value": "checkout-worker" }
+      ],
+      "signal": {
+        "kind": "METRIC",
+        "metricKey": "dt.service.request.failure_count",
+        "aggregation": "SUM"
+      },
+      "detector": {
+        "model": "STATIC",
+        "condition": "ABOVE",
+        "threshold": 5,
+        "violatingSamples": 3,
+        "slidingWindow": 5,
+        "dealertingSamples": 3,
+        "alertOnMissingData": false
+      },
+      "event": {
+        "name": "Checkout com falhas acima do limite",
+        "description": "Falhas detectadas nos serviços de checkout."
+      }
+    },
+    {
+      "id": "APPD-HR-1043",
+      "name": "Checkout - latency anomaly",
+      "targets": [
+        { "selectorType": "ENTITY_ID", "value": "SERVICE-0123456789ABCDEF" }
+      ],
+      "signal": {
+        "kind": "METRIC",
+        "metricKey": "dt.service.request.response_time",
+        "aggregation": "AVG"
+      },
+      "detector": {
+        "model": "AUTO_ADAPTIVE",
+        "condition": "ABOVE",
+        "numberOfSignalFluctuations": 1,
+        "violatingSamples": 3,
+        "slidingWindow": 5,
+        "dealertingSamples": 5,
+        "alertOnMissingData": false
+      },
+      "event": {
+        "name": "Latência anormal no Checkout",
+        "type": "PERFORMANCE_EVENT",
+        "alertGroup": "payments-checkout"
+      },
+      "schedule": {
+        "mode": "ALWAYS"
+      }
+    }
+  ]
+}
+

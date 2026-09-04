@@ -1,0 +1,27 @@
+namespace A2D.AlertMigrator.Application.Alerting;
+
+public sealed record DynatraceProblemSnapshot(
+    string EventId,
+    string DisplayId,
+    string Name,
+    string Description,
+    string Category,
+    string Status,
+    int? Severity,
+    long AffectedUsersCount,
+    int AffectedEntityCount,
+    int CorrelatedEventCount,
+    string RootCauseEntityId,
+    string RootCauseEntityName,
+    string RootCauseEntityType,
+    IReadOnlyList<string> AffectedEntityIds,
+    IReadOnlyList<string> AffectedEntityTypes,
+    IReadOnlyList<string> AffectedServiceIds,
+    IReadOnlyList<string> CorrelatedEventIds,
+    bool IsRootCause,
+    bool IsUnderMaintenance,
+    DateTimeOffset? Timestamp,
+    DateTimeOffset? Start,
+    DateTimeOffset? End,
+    string ContentHash,
+    string RawJson);

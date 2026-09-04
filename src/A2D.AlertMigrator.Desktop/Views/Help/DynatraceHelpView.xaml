@@ -1,0 +1,230 @@
+<UserControl x:Class="A2D.AlertMigrator.Desktop.Views.Help.DynatraceHelpView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource ColorNeutralBackground2}">
+    <UserControl.Resources>
+        <Style x:Key="PermissionCode" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Cascadia Mono, Consolas" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource ColorBrandBackgroundPressed}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style x:Key="StepNumber" TargetType="Border">
+            <Setter Property="Width" Value="26" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="CornerRadius" Value="13" />
+            <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Margin" Value="0,1,12,0" />
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="28,24,28,32">
+            <StackPanel Margin="0,0,0,16">
+                <TextBlock Style="{StaticResource TitleLarge}" Text="Token e permissões do Dynatrace" />
+                <TextBlock Margin="0,4,0,0"
+                           Style="{StaticResource BodyText}"
+                           Text="Como solicitar, criar e validar uma credencial com o menor privilégio necessário para perfis, detectores e consultas DQL." />
+            </StackPanel>
+
+            <Border Style="{StaticResource Card}" Background="{StaticResource ColorBrandBackgroundLight}" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="28" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock FontFamily="Segoe Fluent Icons" FontSize="17" Foreground="{StaticResource ColorBrandBackgroundHover}" Text="&#xE946;" />
+                    <StackPanel Grid.Column="1">
+                        <TextBlock FontWeight="SemiBold" Text="Platform Token: o escopo do token não basta sozinho" />
+                        <TextBlock Margin="0,4,0,0" Style="{StaticResource BodyText}" TextWrapping="Wrap">
+                            <Run Text="O acesso só funciona quando a permissão está " /><Run FontWeight="SemiBold" Text="selecionada no Platform Token" /><Run Text=" e também está liberada pela " /><Run FontWeight="SemiBold" Text="política IAM do usuário ou usuário de serviço" /><Run Text=" associado. O token deve estar limitado à conta e ao ambiente corretos e ser enviado no cabeçalho " /><Run FontFamily="Cascadia Mono, Consolas" Text="Authorization: Bearer" /><Run Text="." />
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource TitleMedium}" Text="Perfil recomendado para o Platform Token" />
+                    <TextBlock Margin="0,4,0,14" Style="{StaticResource CaptionText}" Text="Conjunto necessário para coletar configurações, resolver serviços, validar DQL e aplicar detectores." />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="210" />
+                            <ColumnDefinition Width="310" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.ColumnSpan="3" Background="{StaticResource ColorNeutralBackground3}" Padding="10,8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200" />
+                                    <ColumnDefinition Width="310" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock FontWeight="SemiBold" Text="Uso" />
+                                <TextBlock Grid.Column="1" FontWeight="SemiBold" Text="Permissões" />
+                                <TextBlock Grid.Column="2" FontWeight="SemiBold" Text="Quando liberar" />
+                            </Grid>
+                        </Border>
+
+                        <TextBlock Grid.Row="1" Margin="10,11" TextWrapping="Wrap" Text="API V2 e configurações" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Margin="10,11" Style="{StaticResource PermissionCode}" Text="settings:schemas:read&#x0a;settings:objects:read" />
+                        <TextBlock Grid.Row="1" Grid.Column="2" Margin="10,11" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Lê schemas, perfis de alertas e detectores pelo proxy da Environment API V2." />
+                        <Border Grid.Row="1" Grid.ColumnSpan="3" VerticalAlignment="Bottom" BorderBrush="{StaticResource ColorNeutralStroke2}" BorderThickness="0,0,0,1" />
+
+                        <TextBlock Grid.Row="2" Margin="10,11" TextWrapping="Wrap" Text="Aplicar e reverter" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Margin="10,11" Style="{StaticResource PermissionCode}" Text="settings:objects:write" />
+                        <TextBlock Grid.Row="2" Grid.Column="2" Margin="10,11" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Cria, atualiza e exclui objetos de Settings 2.0 durante implantação ou rollback." />
+                        <Border Grid.Row="2" Grid.ColumnSpan="3" VerticalAlignment="Bottom" BorderBrush="{StaticResource ColorNeutralStroke2}" BorderThickness="0,0,0,1" />
+
+                        <TextBlock Grid.Row="3" Margin="10,11" TextWrapping="Wrap" Text="Validar DQL com timeseries" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Margin="10,11" Style="{StaticResource PermissionCode}" Text="storage:buckets:read&#x0a;storage:metrics:read" />
+                        <TextBlock Grid.Row="3" Grid.Column="2" Margin="10,11" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Consulta dados de métricas no Grail. A política IAM também precisa permitir os buckets envolvidos." />
+                        <Border Grid.Row="3" Grid.ColumnSpan="3" VerticalAlignment="Bottom" BorderBrush="{StaticResource ColorNeutralStroke2}" BorderThickness="0,0,0,1" />
+
+                        <TextBlock Grid.Row="4" Margin="10,11" TextWrapping="Wrap" Text="Resolver serviços e Smartscape" />
+                        <TextBlock Grid.Row="4" Grid.Column="1" Margin="10,11" Style="{StaticResource PermissionCode}" Text="storage:entities:read&#x0a;storage:smartscape:read" />
+                        <TextBlock Grid.Row="4" Grid.Column="2" Margin="10,11" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Necessárias para localizar serviços e usar entityName, entityAttr, smartscapeNodes ou Smartscape IDs." />
+                        <Border Grid.Row="4" Grid.ColumnSpan="3" VerticalAlignment="Bottom" BorderBrush="{StaticResource ColorNeutralStroke2}" BorderThickness="0,0,0,1" />
+
+                        <TextBlock Grid.Row="5" Margin="10,11" TextWrapping="Wrap" Text="Verificar alertas e problemas" />
+                        <TextBlock Grid.Row="5" Grid.Column="1" Margin="10,11" Style="{StaticResource PermissionCode}" Text="storage:events:read" />
+                        <TextBlock Grid.Row="5" Grid.Column="2" Margin="10,11" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Lê Davis events e Davis problems no Grail para validar o resultado dos detectores." />
+                        <Border Grid.Row="5" Grid.ColumnSpan="3" VerticalAlignment="Bottom" BorderBrush="{StaticResource ColorNeutralStroke2}" BorderThickness="0,0,0,1" />
+
+                        <TextBlock Grid.Row="6" Margin="10,11" TextWrapping="Wrap" Text="Modelos Davis" />
+                        <TextBlock Grid.Row="6" Grid.Column="1" Margin="10,11" Style="{StaticResource PermissionCode}" Text="davis:analyzers:read&#x0a;davis:analyzers:execute" />
+                        <TextBlock Grid.Row="6" Grid.Column="2" Margin="10,11" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Lê os analisadores disponíveis e executa a validação. Execute é obrigatório quando o detector não usa usuário de serviço como ator." />
+                        <Border Grid.Row="6" Grid.ColumnSpan="3" VerticalAlignment="Bottom" BorderBrush="{StaticResource ColorNeutralStroke2}" BorderThickness="0,0,0,1" />
+
+                        <TextBlock Grid.Row="7" Margin="10,11" TextWrapping="Wrap" Text="Ator de automação" />
+                        <TextBlock Grid.Row="7" Grid.Column="1" Margin="10,11" Style="{StaticResource PermissionCode}" Text="iam:service-users:use" />
+                        <TextBlock Grid.Row="7" Grid.Column="2" Margin="10,11" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Condicional. Exigida apenas quando a aplicação atribui a execução a um usuário de serviço." />
+                        <Border Grid.Row="7" Grid.ColumnSpan="3" VerticalAlignment="Bottom" BorderBrush="{StaticResource ColorNeutralStroke2}" BorderThickness="0,0,0,1" />
+
+                        <TextBlock Grid.Row="8" Margin="10,11" TextWrapping="Wrap" Text="Objetos de outros proprietários" />
+                        <TextBlock Grid.Row="8" Grid.Column="1" Margin="10,11" Style="{StaticResource PermissionCode}" Text="settings:objects:admin" />
+                        <TextBlock Grid.Row="8" Grid.Column="2" Margin="10,11" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Opcional e privilegiada. Use somente com adminAccess=true quando for necessário acessar objetos sem permissão compartilhada. Não substitui read ou write." />
+                    </Grid>
+
+                    <Border Margin="0,14,0,0" Padding="12" CornerRadius="6" Background="{StaticResource ColorStatusWarningBackground}">
+                        <TextBlock Style="{StaticResource BodyText}" TextWrapping="Wrap">
+                            <Run FontWeight="SemiBold" Text="Não misture os modelos de token: " /><Run Text="os nomes " /><Run FontFamily="Cascadia Mono, Consolas" Text="settings.read" /><Run Text=", " /><Run FontFamily="Cascadia Mono, Consolas" Text="settings.write" /><Run Text=", " /><Run FontFamily="Cascadia Mono, Consolas" Text="entities.read" /><Run Text=" e " /><Run FontFamily="Cascadia Mono, Consolas" Text="metrics.read" /><Run Text=" pertencem ao API Token clássico. Para Platform Token, use os escopos com dois-pontos mostrados na tabela e autenticação Bearer." />
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource TitleMedium}" Text="Endpoints recomendados para teste" />
+                    <TextBlock Margin="0,4,0,12" Style="{StaticResource CaptionText}" TextWrapping="Wrap" Text="Substitua environment-id pelo ID do ambiente. Use Authorization: Bearer com o Platform Token nos endpoints de API." />
+                    <TextBlock FontWeight="SemiBold" Text="URL-base do ambiente validada para conectividade" />
+                    <Border Margin="0,6,0,12" Padding="10,8" CornerRadius="4" Background="{StaticResource ColorNeutralBackground3}">
+                        <TextBlock Style="{StaticResource PermissionCode}" Text="https://&lt;environment-id&gt;.live.dynatrace.com" />
+                    </Border>
+                    <TextBlock FontWeight="SemiBold" Text="Environment API V2: listar perfis de alertas" />
+                    <Border Margin="0,6,0,12" Padding="10,8" CornerRadius="4" Background="{StaticResource ColorNeutralBackground3}">
+                        <TextBlock Style="{StaticResource PermissionCode}" Text="https://&lt;environment-id&gt;.live.dynatrace.com/api/v2/settings/objects?schemaIds=builtin:alerting.profile&amp;pageSize=500&amp;adminAccess=true" />
+                    </Border>
+                    <TextBlock FontWeight="SemiBold" Text="Grail DQL Query API" />
+                    <Border Margin="0,6,0,0" Padding="10,8" CornerRadius="4" Background="{StaticResource ColorNeutralBackground3}">
+                        <TextBlock Style="{StaticResource PermissionCode}" Text="https://&lt;environment-id&gt;.apps.dynatrace.com/platform/storage/query/v1/query:execute" />
+                    </Border>
+                    <TextBlock Margin="0,10,0,0" Style="{StaticResource CaptionText}" TextWrapping="Wrap" Text="A URL-base confirma acesso ao host. Para validar autenticação e autorização, teste a rota /api/v2/settings/objects e espere HTTP 200 com JSON. O parâmetro adminAccess exige settings:objects:admin. A tela Eventos de alertas usa a DQL Query API com Platform Token ou OAuth em modo Bearer." />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource TitleMedium}" Text="Modelo de política IAM" />
+                    <TextBlock Margin="0,4,0,10" Style="{StaticResource CaptionText}" TextWrapping="Wrap" Text="Use como ponto de partida. Restrinja schemas e buckets quando a organização já souber exatamente quais serão utilizados." />
+                    <TextBox MinHeight="212"
+                             Padding="12"
+                             IsReadOnly="True"
+                             AcceptsReturn="True"
+                             TextWrapping="NoWrap"
+                             VerticalScrollBarVisibility="Auto"
+                             HorizontalScrollBarVisibility="Auto"
+                             VerticalContentAlignment="Top"
+                             FontFamily="Cascadia Mono, Consolas"
+                             FontSize="12"
+                             Text="ALLOW settings:schemas:read,&#x0a;      settings:objects:read,&#x0a;      settings:objects:write;&#x0a;&#x0a;ALLOW storage:buckets:read&#x0a;WHERE storage:bucket-name MATCH (&quot;default_*&quot;);&#x0a;&#x0a;ALLOW storage:metrics:read,&#x0a;      storage:entities:read,&#x0a;      storage:smartscape:read,&#x0a;      storage:events:read;&#x0a;&#x0a;ALLOW davis:analyzers:read,&#x0a;      davis:analyzers:execute;" />
+                    <TextBlock Margin="0,8,0,0" Style="{StaticResource CaptionText}" TextWrapping="Wrap" Text="Adicione iam:service-users:use somente se houver usuário de serviço. Adicione settings:objects:admin somente após validar que a restrição de propriedade bloqueia objetos necessários." />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource TitleMedium}" Text="Processo de criação e liberação" />
+                    <TextBlock Margin="0,4,0,16" Style="{StaticResource CaptionText}" Text="O administrador deve conceder as permissões IAM ao usuário antes da geração do token." />
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource StepNumber}"><TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Text="1" /></Border>
+                        <TextBlock Grid.Column="1" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Abra o Account Management e confirme que seu usuário ou usuário de serviço pertence a um grupo com as permissões listadas acima." />
+                    </Grid>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource StepNumber}"><TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Text="2" /></Border>
+                        <TextBlock Grid.Column="1" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Acesse My platform tokens. Informe nome, validade, conta e os ambientes permitidos. Para uso compartilhado, solicite um cliente OAuth ou selecione um usuário de serviço autorizado." />
+                    </Grid>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource StepNumber}"><TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Text="3" /></Border>
+                        <TextBlock Grid.Column="1" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Ao gerar o Platform Token, selecione os mesmos escopos autorizados pela política. Limite-o à conta e ao ambiente escolhidos e defina uma expiração compatível com a política da empresa." />
+                    </Grid>
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource StepNumber}"><TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Text="4" /></Border>
+                        <TextBlock Grid.Column="1" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Gere e copie o segredo imediatamente. Ele é exibido uma única vez. Armazene-o no cofre aprovado pela organização e nunca em CSV, JSON, banco SQLite ou logs." />
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource StepNumber}"><TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold" Text="5" /></Border>
+                        <TextBlock Grid.Column="1" Style="{StaticResource BodyText}" TextWrapping="Wrap" Text="Em Configurações, escolha Platform Token ou OAuth (Bearer) e use https://environment-id.live.dynatrace.com/api/v2/settings/objects para validar a Environment API V2. Um 401 indica token ou cabeçalho inválido. Um 403 indica ambiente, escopo do token, política IAM ou propriedade do objeto." />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource TitleMedium}" Text="Modelo curto para o chamado de acesso" />
+                    <TextBox Margin="0,12,0,0"
+                             MinHeight="214"
+                             Padding="12"
+                             IsReadOnly="True"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             VerticalContentAlignment="Top"
+                             Text="Solicito um Platform Token para a migração AppDynamics → Dynatrace.&#x0a;Conta e ambiente: [informar]&#x0a;Identidade associada e validade: [informar]&#x0a;Origem da conexão: [máquina, rede e proxy]&#x0a;Uso: coletar perfis, detectores, serviços e eventos; validar DQL timeseries; aplicar e reverter configurações.&#x0a;Escopos e política IAM: settings:schemas:read, settings:objects:read, settings:objects:write, storage:buckets:read, storage:metrics:read, storage:entities:read, storage:smartscape:read, storage:events:read, davis:analyzers:read e davis:analyzers:execute.&#x0a;Condicionais: iam:service-users:use e settings:objects:admin.&#x0a;Serviços e aplicações no escopo: [informar]&#x0a;Aprovador e janela de mudança: [informar]" />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource TitleMedium}" Text="Documentação oficial" />
+                    <WrapPanel Margin="0,12,0,0">
+                        <Button Margin="0,0,8,8" Command="{Binding OpenPlatformTokensCommand}" Content="Tokens de plataforma" />
+                        <Button Margin="0,0,8,8" Command="{Binding OpenAlertAutomationCommand}" Content="Detectores via API" />
+                        <Button Margin="0,0,8,8" Command="{Binding OpenGrailPermissionsCommand}" Content="Permissões do Grail" />
+                    </WrapPanel>
+                    <TextBlock Style="{StaticResource CaptionText}" TextWrapping="Wrap" Text="Os links são abertos no navegador padrão. Consulte a documentação do seu tenant antes da aprovação, pois recursos disponíveis podem variar por versão e licenciamento." />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

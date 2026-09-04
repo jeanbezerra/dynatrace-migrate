@@ -1,0 +1,315 @@
+<UserControl x:Class="A2D.AlertMigrator.Desktop.Views.Integrations.IntegrationSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:settingsViewModels="clr-namespace:A2D.AlertMigrator.Desktop.ViewModels.Settings"
+             MinWidth="800"
+             MinHeight="560"
+             Loaded="ViewLoaded"
+             DataContextChanged="ViewDataContextChanged">
+    <UserControl.Resources>
+        <DataTemplate x:Key="EnvironmentTestResultTemplate" DataType="{x:Type settingsViewModels:RemoteTestPresentation}">
+            <Border x:Name="ResultBorder"
+                    Padding="14"
+                    CornerRadius="6"
+                    BorderThickness="1"
+                    Background="{StaticResource ColorNeutralBackground1}"
+                    BorderBrush="{StaticResource ColorNeutralStroke2}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="38" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="ResultIconBackground"
+                            Width="28"
+                            Height="28"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            CornerRadius="14"
+                            Background="{StaticResource ColorNeutralBackground3}">
+                        <TextBlock x:Name="ResultIcon"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Segoe Fluent Icons"
+                                   FontSize="14"
+                                   Text="&#xE946;" />
+                    </Border>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock FontSize="15" FontWeight="SemiBold" Text="{Binding Title}" />
+                        <TextBlock Margin="0,3,0,0" Style="{StaticResource BodyText}" Text="{Binding Message}" TextWrapping="Wrap" />
+                        <WrapPanel Margin="0,10,0,0">
+                            <Border Margin="0,0,8,6" Padding="8,4" CornerRadius="10" Background="{StaticResource ColorNeutralBackground3}"
+                                    Visibility="{Binding HasStatusCode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock FontSize="12" FontWeight="SemiBold" Text="{Binding StatusCode}" />
+                            </Border>
+                            <Border Margin="0,0,8,6" Padding="8,4" CornerRadius="10" Background="{StaticResource ColorNeutralBackground3}"
+                                    Visibility="{Binding HasDuration, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock FontSize="12"><Run Text="Tempo: " /><Run FontWeight="SemiBold" Text="{Binding Duration}" /></TextBlock>
+                            </Border>
+                            <Border Margin="0,0,8,6" Padding="8,4" CornerRadius="10" Background="{StaticResource ColorNeutralBackground3}"
+                                    Visibility="{Binding HasProtocol, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock FontSize="12" FontWeight="SemiBold" Text="{Binding Protocol}" />
+                            </Border>
+                        </WrapPanel>
+                        <TextBlock Margin="0,5,0,0"
+                                   FontFamily="Cascadia Mono, Consolas"
+                                   FontSize="12"
+                                   Text="{Binding RedirectLocation}"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding HasRedirect, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding State}" Value="Running">
+                    <Setter TargetName="ResultBorder" Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                    <Setter TargetName="ResultBorder" Property="BorderBrush" Value="{StaticResource ColorBrandBackground}" />
+                    <Setter TargetName="ResultIconBackground" Property="Background" Value="{StaticResource ColorBrandBackground}" />
+                    <Setter TargetName="ResultIcon" Property="Foreground" Value="White" />
+                    <Setter TargetName="ResultIcon" Property="Text" Value="&#xE895;" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="Success">
+                    <Setter TargetName="ResultBorder" Property="Background" Value="{StaticResource ColorStatusSuccessBackground}" />
+                    <Setter TargetName="ResultBorder" Property="BorderBrush" Value="{StaticResource ColorStatusSuccess}" />
+                    <Setter TargetName="ResultIconBackground" Property="Background" Value="{StaticResource ColorStatusSuccess}" />
+                    <Setter TargetName="ResultIcon" Property="Foreground" Value="White" />
+                    <Setter TargetName="ResultIcon" Property="Text" Value="&#xE73E;" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="Warning">
+                    <Setter TargetName="ResultBorder" Property="Background" Value="{StaticResource ColorStatusWarningBackground}" />
+                    <Setter TargetName="ResultBorder" Property="BorderBrush" Value="{StaticResource ColorStatusWarning}" />
+                    <Setter TargetName="ResultIconBackground" Property="Background" Value="{StaticResource ColorStatusWarning}" />
+                    <Setter TargetName="ResultIcon" Property="Foreground" Value="White" />
+                    <Setter TargetName="ResultIcon" Property="Text" Value="&#xE7BA;" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="Error">
+                    <Setter TargetName="ResultBorder" Property="Background" Value="{StaticResource ColorStatusDangerBackground}" />
+                    <Setter TargetName="ResultBorder" Property="BorderBrush" Value="{StaticResource ColorStatusDanger}" />
+                    <Setter TargetName="ResultIconBackground" Property="Background" Value="{StaticResource ColorStatusDanger}" />
+                    <Setter TargetName="ResultIcon" Property="Foreground" Value="White" />
+                    <Setter TargetName="ResultIcon" Property="Text" Value="&#xE783;" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Margin="28,22,28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="0,0,0,16">
+            <TextBlock Style="{StaticResource TitleLarge}" Text="{Binding PageTitle}" />
+            <TextBlock Margin="0,4,0,0" Style="{StaticResource BodyText}" Text="{Binding PageDescription}" />
+        </StackPanel>
+
+        <Border Grid.Row="1"
+                Margin="0,0,0,14"
+                Padding="12"
+                CornerRadius="6"
+                BorderBrush="{StaticResource ColorStatusWarning}"
+                BorderThickness="1"
+                Background="{StaticResource ColorStatusWarningBackground}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="28" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock FontFamily="Segoe Fluent Icons" FontSize="16" Foreground="{StaticResource ColorStatusWarning}" Text="&#xE7BA;" />
+                <StackPanel Grid.Column="1">
+                    <TextBlock FontWeight="SemiBold" Text="Armazenamento em texto simples" />
+                    <TextBlock Margin="0,3,0,0" Style="{StaticResource BodyText}" TextWrapping="Wrap"
+                               Text="As chaves são gravadas sem criptografia no settings.json, conforme definido para este projeto. Restrinja o acesso ao perfil do Windows e não compartilhe esse arquivo." />
+                    <TextBlock Margin="0,5,0,0" FontFamily="Cascadia Mono, Consolas" FontSize="12" Text="{Binding SettingsPath}" TextWrapping="Wrap" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="286" />
+                <ColumnDefinition Width="14" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Style="{StaticResource Card}" Padding="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="16,16,16,10">
+                        <TextBlock Style="{StaticResource TitleMedium}" Text="Ambientes" />
+                        <TextBlock Margin="0,3,0,0" Style="{StaticResource CaptionText}" Text="Três conexões independentes" />
+                    </StackPanel>
+                    <ListBox Grid.Row="1"
+                             Margin="8,0,8,8"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             ItemsSource="{Binding Environments}"
+                             SelectedItem="{Binding SelectedEnvironment}"
+                             SelectionChanged="EnvironmentSelectionChanged">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Margin" Value="0,2" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="EnvironmentBorder"
+                                                    Padding="12,10"
+                                                    CornerRadius="6"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                                <ContentPresenter />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="EnvironmentBorder" Property="Background" Value="{StaticResource ColorNeutralBackground3}" />
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="EnvironmentBorder" Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                                                    <Setter TargetName="EnvironmentBorder" Property="BorderBrush" Value="{StaticResource ColorBrandBackground}" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="44" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Width="38" Height="24" CornerRadius="12" Background="{StaticResource ColorNeutralBackground1}">
+                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold" Text="{Binding EnvironmentLabel}" />
+                                    </Border>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock FontWeight="SemiBold" Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Margin="0,3,0,0" Style="{StaticResource CaptionText}" Text="{Binding ConnectionSummary}" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource Card}" Padding="0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="18" DataContext="{Binding SelectedEnvironment}">
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource TitleMedium}" Text="{Binding DisplayName}" />
+                                <TextBlock Margin="0,3,0,0" Style="{StaticResource CaptionText}">
+                                    <Run Text="Ambiente " /><Run FontWeight="SemiBold" Text="{Binding EnvironmentLabel, Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+                            <CheckBox Grid.Column="1" VerticalAlignment="Center" IsChecked="{Binding Enabled}" Content="Conexão ativa" />
+                        </Grid>
+
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Apelido" />
+                                <TextBox Text="{Binding Alias, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold"
+                                           Text="{Binding DataContext.TenantIdentifierLabel, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                <TextBox Text="{Binding TenantIdentifier, UpdateSourceTrigger=PropertyChanged}"
+                                         ToolTip="{Binding DataContext.TenantIdentifierHint, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Margin="0,0,0,5" FontWeight="SemiBold"
+                                   Text="{Binding DataContext.BaseAddressLabel, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        <TextBox Text="{Binding BaseAddress, UpdateSourceTrigger=LostFocus}"
+                                 ToolTip="{Binding DataContext.BaseAddressExample, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        <TextBlock Margin="0,4,0,12" Style="{StaticResource CaptionText}"
+                                   Text="{Binding DataContext.BaseAddressExample, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+
+                        <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="URL completa do teste (opcional)" />
+                        <TextBox Text="{Binding TestAddress, UpdateSourceTrigger=LostFocus}" />
+                        <TextBlock Margin="0,4,0,12" Style="{StaticResource CaptionText}" TextWrapping="Wrap"
+                                   Text="{Binding DataContext.TestAddressExample, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Autenticação" />
+                                <ComboBox ItemsSource="{Binding DataContext.AuthenticationModes, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          DisplayMemberPath="Label"
+                                          SelectedValuePath="Mode"
+                                          SelectedValue="{Binding AuthenticationMode}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Status esperado" />
+                                <TextBox Text="{Binding ExpectedStatusCode, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Margin="0,0,0,5" FontWeight="SemiBold"
+                                   Text="{Binding DataContext.UsernameLabel, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        <TextBox Margin="0,0,0,12" Text="{Binding Username, UpdateSourceTrigger=LostFocus}" />
+
+                        <TextBlock Margin="0,0,0,5" FontWeight="SemiBold"
+                                   Text="{Binding DataContext.KeyLabel, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                        <PasswordBox x:Name="IntegrationKeyBox"
+                                     PasswordChanged="IntegrationKeyPasswordChanged"
+                                     ToolTip="A chave será mascarada na tela, mas gravada em texto simples no settings.json" />
+                        <TextBlock Margin="0,4,0,12" Style="{StaticResource CaptionText}" Text="{Binding KeyStatus}" />
+
+                        <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Detalhes e observações" />
+                        <TextBox MinHeight="86"
+                                 AcceptsReturn="True"
+                                 VerticalContentAlignment="Top"
+                                 TextWrapping="Wrap"
+                                 Text="{Binding Details, UpdateSourceTrigger=LostFocus}" />
+
+                        <ContentControl Margin="0,16,0,0"
+                                        Content="{Binding TestResult}"
+                                        ContentTemplate="{StaticResource EnvironmentTestResultTemplate}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="3" Margin="0,14,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Border Padding="12,8" CornerRadius="6" Background="{StaticResource ColorBrandBackgroundLight}">
+                <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+            </Border>
+            <StackPanel Grid.Column="1" Margin="12,0,0,0" Orientation="Horizontal">
+                <Button Margin="0,0,8,0" Command="{Binding RestoreSelectedCommand}" Content="Limpar ambiente" />
+                <Button Margin="0,0,8,0" Command="{Binding TestCommand}" Content="Testar conexão" />
+                <Button Command="{Binding SaveCommand}" Content="Salvar ambientes" Style="{StaticResource PrimaryButton}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

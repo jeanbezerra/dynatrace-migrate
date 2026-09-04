@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon />
+    <AssemblyName>A2D.AlertMigrator</AssemblyName>
+    <RootNamespace>A2D.AlertMigrator.Desktop</RootNamespace>
+    <Product>A2D Alert Migrator</Product>
+    <Authors>A2D</Authors>
+    <Description>Migrador local de regras de alerta do AppDynamics para o Dynatrace.</Description>
+    <NeutralLanguage>pt-BR</NeutralLanguage>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\A2D.AlertMigrator.Application\A2D.AlertMigrator.Application.csproj" />
+    <ProjectReference Include="..\A2D.AlertMigrator.Domain\A2D.AlertMigrator.Domain.csproj" />
+    <ProjectReference Include="..\A2D.AlertMigrator.Infrastructure\A2D.AlertMigrator.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

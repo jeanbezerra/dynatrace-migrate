@@ -1,0 +1,680 @@
+<UserControl x:Class="A2D.AlertMigrator.Desktop.Views.Settings.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:settingsViewModels="clr-namespace:A2D.AlertMigrator.Desktop.ViewModels.Settings"
+             MinWidth="800"
+             MinHeight="560">
+    <UserControl.Resources>
+        <DataTemplate x:Key="RemoteTestResultTemplate" DataType="{x:Type settingsViewModels:RemoteTestPresentation}">
+            <Border x:Name="ResultBorder"
+                    Padding="14"
+                    CornerRadius="6"
+                    BorderThickness="1"
+                    Background="{StaticResource ColorNeutralBackground1}"
+                    BorderBrush="{StaticResource ColorNeutralStroke2}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="38" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="ResultIconBackground"
+                            Width="28"
+                            Height="28"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            CornerRadius="14"
+                            Background="{StaticResource ColorNeutralBackground3}">
+                        <TextBlock x:Name="ResultIcon"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Segoe Fluent Icons"
+                                   FontSize="14"
+                                   Text="&#xE946;" />
+                    </Border>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock FontSize="15" FontWeight="SemiBold" Text="{Binding Title}" />
+                        <TextBlock Margin="0,3,0,0" Style="{StaticResource BodyText}" Text="{Binding Message}" TextWrapping="Wrap" />
+                        <WrapPanel Margin="0,10,0,0">
+                            <Border Margin="0,0,8,6"
+                                    Padding="8,4"
+                                    CornerRadius="10"
+                                    Background="{StaticResource ColorNeutralBackground3}"
+                                    Visibility="{Binding HasStatusCode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock FontSize="12" FontWeight="SemiBold" Text="{Binding StatusCode}" />
+                            </Border>
+                            <Border Margin="0,0,8,6"
+                                    Padding="8,4"
+                                    CornerRadius="10"
+                                    Background="{StaticResource ColorNeutralBackground3}"
+                                    Visibility="{Binding HasDuration, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock FontSize="12"><Run Text="Tempo: " /><Run FontWeight="SemiBold" Text="{Binding Duration}" /></TextBlock>
+                            </Border>
+                            <Border Margin="0,0,8,6"
+                                    Padding="8,4"
+                                    CornerRadius="10"
+                                    Background="{StaticResource ColorNeutralBackground3}"
+                                    Visibility="{Binding HasProtocol, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock FontSize="12" FontWeight="SemiBold" Text="{Binding Protocol}" />
+                            </Border>
+                        </WrapPanel>
+                        <Border Margin="0,6,0,0"
+                                Padding="10,8"
+                                CornerRadius="4"
+                                Background="{StaticResource ColorNeutralBackground1}"
+                                BorderBrush="{StaticResource ColorStatusWarning}"
+                                BorderThickness="1"
+                                Visibility="{Binding HasRedirect, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <StackPanel>
+                                <TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource ColorStatusWarning}" Text="Destino informado pelo servidor" />
+                                <TextBlock Margin="0,3,0,0" FontFamily="Cascadia Mono, Consolas" FontSize="12" Text="{Binding RedirectLocation}" TextWrapping="Wrap" />
+                                <TextBlock Margin="0,5,0,0" Style="{StaticResource CaptionText}" TextWrapping="Wrap" Text="Use essa URL no próximo teste somente depois de confirmar que ela pertence ao ambiente esperado." />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding State}" Value="Running">
+                    <Setter TargetName="ResultBorder" Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                    <Setter TargetName="ResultBorder" Property="BorderBrush" Value="{StaticResource ColorBrandBackground}" />
+                    <Setter TargetName="ResultIconBackground" Property="Background" Value="{StaticResource ColorBrandBackground}" />
+                    <Setter TargetName="ResultIcon" Property="Foreground" Value="White" />
+                    <Setter TargetName="ResultIcon" Property="Text" Value="&#xE895;" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="Success">
+                    <Setter TargetName="ResultBorder" Property="Background" Value="{StaticResource ColorStatusSuccessBackground}" />
+                    <Setter TargetName="ResultBorder" Property="BorderBrush" Value="{StaticResource ColorStatusSuccess}" />
+                    <Setter TargetName="ResultIconBackground" Property="Background" Value="{StaticResource ColorStatusSuccess}" />
+                    <Setter TargetName="ResultIcon" Property="Foreground" Value="White" />
+                    <Setter TargetName="ResultIcon" Property="Text" Value="&#xE73E;" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="Warning">
+                    <Setter TargetName="ResultBorder" Property="Background" Value="{StaticResource ColorStatusWarningBackground}" />
+                    <Setter TargetName="ResultBorder" Property="BorderBrush" Value="{StaticResource ColorStatusWarning}" />
+                    <Setter TargetName="ResultIconBackground" Property="Background" Value="{StaticResource ColorStatusWarning}" />
+                    <Setter TargetName="ResultIcon" Property="Foreground" Value="White" />
+                    <Setter TargetName="ResultIcon" Property="Text" Value="&#xE7BA;" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding State}" Value="Error">
+                    <Setter TargetName="ResultBorder" Property="Background" Value="{StaticResource ColorStatusDangerBackground}" />
+                    <Setter TargetName="ResultBorder" Property="BorderBrush" Value="{StaticResource ColorStatusDanger}" />
+                    <Setter TargetName="ResultIconBackground" Property="Background" Value="{StaticResource ColorStatusDanger}" />
+                    <Setter TargetName="ResultIcon" Property="Foreground" Value="White" />
+                    <Setter TargetName="ResultIcon" Property="Text" Value="&#xE783;" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid Margin="28,22,28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="0,0,0,18">
+            <TextBlock Style="{StaticResource TitleLarge}" Text="Configurações do aplicativo" />
+            <TextBlock Margin="0,4,0,0"
+                       Style="{StaticResource BodyText}"
+                       Text="Defina codificação, limites, armazenamento e conectividade compartilhada." />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Border Margin="0,0,0,14" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TitleMedium}" Text="Arquivos e codificação" />
+                        <TextBlock Margin="0,3,0,16"
+                                   Style="{StaticResource CaptionText}"
+                                   Text="Arquivos inválidos são bloqueados antes da leitura do JSON." />
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold" Text="Codificação de entrada" />
+                                <TextBlock Style="{StaticResource CaptionText}" Text="JSON importado" />
+                            </StackPanel>
+                            <Border Grid.Column="1"
+                                    Padding="10,6"
+                                    CornerRadius="4"
+                                    Background="{StaticResource ColorNeutralBackground3}">
+                                <TextBlock FontWeight="SemiBold" Text="UTF-8 estrito" />
+                            </Border>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold" Text="Política de BOM" />
+                                <TextBlock Style="{StaticResource CaptionText}" Text="Marcador inicial UTF-8" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <ComboBox ItemsSource="{Binding BomPolicies}"
+                                          DisplayMemberPath="Label"
+                                          SelectedItem="{Binding SelectedBomPolicy}" />
+                                <TextBlock Margin="0,5,0,0"
+                                           Style="{StaticResource CaptionText}"
+                                           Text="{Binding SelectedBomPolicy.Description}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold" Text="Codificação de saída" />
+                                <TextBlock Style="{StaticResource CaptionText}" Text="Configurações e exemplos gerados" />
+                            </StackPanel>
+                            <Border Grid.Column="1"
+                                    Padding="10,6"
+                                    CornerRadius="4"
+                                    Background="{StaticResource ColorNeutralBackground3}">
+                                <TextBlock FontWeight="SemiBold" Text="UTF-8 sem BOM" />
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="0,0,0,14" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TitleMedium}" Text="Limites de importação" />
+                        <CheckBox Margin="0,10,0,16"
+                                  Content="Incluir subpastas por padrão"
+                                  IsChecked="{Binding RecursiveByDefault}" />
+
+                        <UniformGrid Columns="3">
+                            <StackPanel Margin="0,0,18,14">
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Tamanho por arquivo (MiB)" />
+                                <TextBox Text="{Binding MaxFileSizeMb, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,18,14">
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Máximo de arquivos" />
+                                <TextBox Text="{Binding MaxFiles, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,0,14">
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Regras por aplicação" />
+                                <TextBox Text="{Binding MaxRulesPerApplication, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,18,0">
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Total de regras" />
+                                <TextBox Text="{Binding MaxRulesTotal, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,18,0">
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Profundidade JSON" />
+                                <TextBox Text="{Binding MaxJsonDepth, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Máximo de caracteres DQL" />
+                                <TextBox Text="{Binding MaxDqlCharacters, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="0,0,0,14" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TitleMedium}" Text="Logs estruturados" />
+                        <TextBlock Margin="0,3,0,16"
+                                   Style="{StaticResource CaptionText}"
+                                   Text="Os logs usam JSON Lines em UTF-8, data e hora UTC no padrão ISO 8601 e permitem leitura compartilhada em tempo real." />
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold" Text="Pasta dos logs" />
+                                <TextBlock Style="{StaticResource CaptionText}" Text="Pode ser lida por ferramentas externas" />
+                            </StackPanel>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding LogDirectory, UpdateSourceTrigger=LostFocus}" />
+                                <Button Grid.Column="1"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding ChooseLogFolderCommand}"
+                                        Content="Escolher pasta"
+                                        AutomationProperties.Name="Escolher pasta dos logs" />
+                            </Grid>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold" Text="Nível de detalhamento" />
+                                <TextBlock Style="{StaticResource CaptionText}" Text="Nível mínimo gravado" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <ComboBox ItemsSource="{Binding LogLevels}"
+                                          DisplayMemberPath="Label"
+                                          SelectedItem="{Binding SelectedLogLevel}" />
+                                <TextBlock Margin="0,5,0,0"
+                                           Style="{StaticResource CaptionText}"
+                                           Text="{Binding SelectedLogLevel.Description}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold" Text="Rotação" />
+                                <TextBlock Style="{StaticResource CaptionText}" Text="Controla uso de disco" />
+                            </StackPanel>
+                            <CheckBox Grid.Column="1"
+                                      Content="Rotacionar quando o arquivo atingir o limite"
+                                      IsChecked="{Binding LogRotationEnabled}" />
+                        </Grid>
+
+                        <Grid Margin="220,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,18,0" IsEnabled="{Binding LogRotationEnabled}">
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Tamanho por arquivo (MiB)" />
+                                <TextBox Text="{Binding LogRotationSizeMb, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" IsEnabled="{Binding LogRotationEnabled}">
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Arquivos históricos mantidos" />
+                                <TextBox Text="{Binding RetainedLogFileCount, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Arquivo atual" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox IsReadOnly="True" Text="{Binding CurrentLogPath, Mode=OneWay}" />
+                            <Button Grid.Column="1"
+                                    Margin="8,0,0,0"
+                                    Command="{Binding WriteTestLogCommand}"
+                                    Content="Gravar evento de teste"
+                                    AutomationProperties.Name="Gravar evento de teste no log" />
+                        </Grid>
+                        <TextBlock Margin="0,6,0,0"
+                                   Style="{StaticResource CaptionText}"
+                                   Text="Cada evento é liberado imediatamente para leitura. Credenciais e conteúdo integral dos arquivos não são registrados." />
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="0,0,0,14" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TitleMedium}" Text="Configuração do HTTP Client" />
+                        <TextBlock Margin="0,3,0,16"
+                                   Style="{StaticResource CaptionText}"
+                                   Text="Defina como as conexões HTTPS serão executadas nas integrações remotas." />
+
+                        <TextBlock Margin="0,0,0,8" FontWeight="SemiBold" Text="Resiliência e conexões" />
+                        <UniformGrid Columns="3" Margin="0,0,0,14">
+                            <StackPanel Margin="0,0,18,12">
+                                <TextBlock Margin="0,0,0,5" Text="Conexão (segundos)" />
+                                <TextBox Text="{Binding ConnectTimeoutSeconds, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,18,12">
+                                <TextBlock Margin="0,0,0,5" Text="Tempo total da requisição (segundos)" />
+                                <TextBox Text="{Binding RequestTimeoutSeconds, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Margin="0,0,0,5" Text="Tentativas adicionais" />
+                                <TextBox Text="{Binding RetryCount, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,18,0">
+                                <TextBlock Margin="0,0,0,5" Text="Intervalo inicial entre tentativas (ms)" />
+                                <TextBox Text="{Binding RetryDelayMilliseconds, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,18,0">
+                                <TextBlock Margin="0,0,0,5" Text="Renovação das conexões e do DNS (minutos)" />
+                                <TextBox Text="{Binding PooledConnectionLifetimeMinutes, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Margin="0,0,0,5" Text="Conexões por servidor" />
+                                <TextBox Text="{Binding MaxConnectionsPerServer, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                        </UniformGrid>
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold" Text="Validação TLS" />
+                                <TextBlock Style="{StaticResource CaptionText}" Text="Certificado do servidor" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <ComboBox ItemsSource="{Binding CertificateModes}"
+                                          DisplayMemberPath="Label"
+                                          SelectedItem="{Binding SelectedCertificateMode}" />
+                                <TextBlock Margin="0,5,0,0" Style="{StaticResource CaptionText}"
+                                           Text="{Binding SelectedCertificateMode.Description}" />
+                                <CheckBox Margin="0,8,0,0"
+                                          IsChecked="{Binding CheckCertificateRevocation}"
+                                          Content="Verificar revogação do certificado" />
+
+                                <Grid Margin="0,8,0,0"
+                                      Visibility="{Binding IsCustomCertificateAuthority, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding CustomCertificateAuthorityPath, UpdateSourceTrigger=LostFocus}" />
+                                    <Button Grid.Column="1" Margin="8,0,0,0"
+                                            Command="{Binding ChooseCertificateAuthorityCommand}"
+                                            Content="Escolher CA" />
+                                </Grid>
+                                <TextBox Margin="0,8,0,0"
+                                         Visibility="{Binding IsCertificatePinning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                         Text="{Binding PinnedCertificateSha256, UpdateSourceTrigger=LostFocus}"
+                                         ToolTip="Impressão digital SHA-256, com ou sem separadores" />
+                                <Border Margin="0,8,0,0" Padding="10,8" CornerRadius="4"
+                                        Background="{StaticResource ColorStatusDangerBackground}"
+                                        Visibility="{Binding IsDangerousCertificateMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <TextBlock Foreground="{StaticResource ColorStatusDanger}" TextWrapping="Wrap"
+                                               Text="A validação do certificado está desativada. Use somente para diagnóstico temporário e nunca durante uma migração real." />
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Cabeçalhos personalizados" />
+                        <TextBox MinHeight="76"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"
+                                 TextWrapping="NoWrap"
+                                 Text="{Binding CustomHeadersText, UpdateSourceTrigger=LostFocus}" />
+                        <TextBlock Margin="0,5,0,14" Style="{StaticResource CaptionText}" TextWrapping="Wrap"
+                                   Text="Informe um cabeçalho por linha no formato Nome: valor. Cabeçalhos de autorização, cookies e outros campos sensíveis ou reservados são bloqueados. Os tokens usados nos testes ficam somente na memória." />
+
+                        <TextBlock Style="{StaticResource CaptionText}" TextWrapping="Wrap"
+                                   Text="Estas opções também são aplicadas aos testes de conexão e de API." />
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="0,0,0,14" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TitleMedium}" Text="Configuração de proxy" />
+                        <TextBlock Margin="0,3,0,16" Style="{StaticResource CaptionText}" TextWrapping="Wrap"
+                                   Text="Defina se o aplicativo usa o proxy do Windows, uma conexão direta ou um servidor de proxy específico." />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold" Text="Modo de acesso" />
+                                <TextBlock Style="{StaticResource CaptionText}" Text="Aplicado a todas as integrações remotas" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <ComboBox ItemsSource="{Binding ProxyModes}"
+                                          DisplayMemberPath="Label"
+                                          SelectedItem="{Binding SelectedProxyMode}" />
+                                <TextBlock Margin="0,5,0,0" Style="{StaticResource CaptionText}"
+                                           Text="{Binding SelectedProxyMode.Description}" />
+                                <TextBox Margin="0,8,0,0"
+                                         IsEnabled="{Binding IsCustomProxy}"
+                                         Text="{Binding CustomProxyAddress, UpdateSourceTrigger=LostFocus}"
+                                         ToolTip="Exemplo: http://proxy.corporativo:8080" />
+                                <CheckBox Margin="0,8,0,0"
+                                          IsEnabled="{Binding IsProxyEnabled}"
+                                          IsChecked="{Binding UseDefaultProxyCredentials}"
+                                          Content="Usar as credenciais integradas do Windows" />
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="0,0,0,14" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TitleMedium}" Text="Testes de conexão e API" />
+                        <TextBlock Margin="0,3,0,16" Style="{StaticResource CaptionText}" TextWrapping="Wrap"
+                                   Text="Configure cada plataforma com sua própria URL, método de acesso, autenticação e resposta esperada. Os tokens permanecem apenas na memória e nunca são salvos nos arquivos ou registrados nos logs." />
+
+                        <StackPanel>
+                            <Border Padding="16" CornerRadius="6" Background="{StaticResource ColorNeutralBackground3}">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,14">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Style="{StaticResource TitleMedium}" Text="Dynatrace" />
+                                            <TextBlock Margin="0,3,0,0" Style="{StaticResource CaptionText}" Text="Platform Token usa autenticação Bearer" />
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Command="{Binding TestDynatraceCommand}" Content="Executar teste Dynatrace" Style="{StaticResource PrimaryButton}" />
+                                    </Grid>
+
+                                    <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="URL completa do teste" />
+                                    <Grid>
+                                        <TextBox Text="{Binding DynatraceTestAddress, UpdateSourceTrigger=LostFocus}" ToolTip="Use o endereço live.dynatrace.com do seu ambiente" />
+                                        <TextBlock Margin="10,0" VerticalAlignment="Center" IsHitTestVisible="False"
+                                                   Foreground="{StaticResource ColorNeutralForeground3}" TextTrimming="CharacterEllipsis"
+                                                   Text="https://environment-id.live.dynatrace.com/api/v2/settings/objects?schemaIds=builtin:alerting.profile&amp;pageSize=1"
+                                                   Visibility="{Binding DynatraceTestAddress, Converter={StaticResource StringNullOrWhiteSpaceToVisibilityConverter}}" />
+                                    </Grid>
+                                    <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionText}" TextWrapping="Wrap"
+                                               Text="A URL-base validada é https://environment-id.live.dynatrace.com. Mantenha /api/v2/settings/objects para testar também o token e a permissão de leitura." />
+
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="130" /><ColumnDefinition Width="14" />
+                                            <ColumnDefinition Width="130" /><ColumnDefinition Width="14" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Método" />
+                                            <ComboBox ItemsSource="{Binding TestMethods}" DisplayMemberPath="Label" SelectedItem="{Binding SelectedDynatraceTestMethod}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Status esperado" />
+                                            <TextBox Text="{Binding DynatraceExpectedStatusCode, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="4">
+                                            <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Autenticação" />
+                                            <ComboBox ItemsSource="{Binding DynatraceAuthenticationModes}" DisplayMemberPath="Label" SelectedItem="{Binding SelectedDynatraceAuthentication}" />
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock Margin="288,4,0,0" Style="{StaticResource CaptionText}" TextWrapping="Wrap" Text="{Binding SelectedDynatraceAuthentication.Description}" />
+                                    <TextBox Margin="0,8,0,0" Visibility="{Binding IsDynatraceBasicAuthentication, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                             Text="{Binding DynatraceTestUsername, UpdateSourceTrigger=LostFocus}" ToolTip="Usuário Basic" />
+                                    <TextBlock Margin="0,10,0,5" FontWeight="SemiBold" Text="Token usado somente nesta sessão" />
+                                    <PasswordBox x:Name="DynatraceSecretBox" IsEnabled="{Binding DynatraceAuthenticationRequiresSecret}"
+                                                 PasswordChanged="DynatraceSecretPasswordChanged"
+                                                 ToolTip="Informe o Platform Token, access token OAuth ou API Token conforme a autenticação selecionada" />
+                                    <ContentControl Margin="0,14,0,0" Content="{Binding DynatraceTestResult}" ContentTemplate="{StaticResource RemoteTestResultTemplate}" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Margin="0,14,0,0" Padding="16" CornerRadius="6" Background="{StaticResource ColorNeutralBackground3}">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,14">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Style="{StaticResource TitleMedium}" Text="AppDynamics" />
+                                            <TextBlock Margin="0,3,0,0" Style="{StaticResource CaptionText}" Text="Use Bearer ou OAuth; Basic atende somente ambientes legados" />
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Command="{Binding TestAppDynamicsCommand}" Content="Executar teste AppDynamics" Style="{StaticResource PrimaryButton}" />
+                                    </Grid>
+
+                                    <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="URL completa do teste" />
+                                    <TextBox Text="{Binding AppDynamicsTestAddress, UpdateSourceTrigger=LostFocus}" ToolTip="A URL pode incluir o caminho e os parâmetros da API" />
+
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="130" /><ColumnDefinition Width="14" />
+                                            <ColumnDefinition Width="130" /><ColumnDefinition Width="14" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Método" />
+                                            <ComboBox ItemsSource="{Binding TestMethods}" DisplayMemberPath="Label" SelectedItem="{Binding SelectedAppDynamicsTestMethod}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Status esperado" />
+                                            <TextBox Text="{Binding AppDynamicsExpectedStatusCode, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="4">
+                                            <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Autenticação" />
+                                            <ComboBox ItemsSource="{Binding AppDynamicsAuthenticationModes}" DisplayMemberPath="Label" SelectedItem="{Binding SelectedAppDynamicsAuthentication}" />
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock Margin="288,4,0,0" Style="{StaticResource CaptionText}" TextWrapping="Wrap" Text="{Binding SelectedAppDynamicsAuthentication.Description}" />
+                                    <TextBox Margin="0,8,0,0" Visibility="{Binding IsAppDynamicsBasicAuthentication, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                             Text="{Binding AppDynamicsTestUsername, UpdateSourceTrigger=LostFocus}" ToolTip="Usuário Basic" />
+                                    <TextBlock Margin="0,10,0,5" FontWeight="SemiBold" Text="Token ou senha usado somente nesta sessão" />
+                                    <PasswordBox x:Name="AppDynamicsSecretBox" IsEnabled="{Binding AppDynamicsAuthenticationRequiresSecret}"
+                                                 PasswordChanged="AppDynamicsSecretPasswordChanged" ToolTip="O token ou segredo fica somente na memória" />
+                                    <ContentControl Margin="0,14,0,0" Content="{Binding AppDynamicsTestResult}" ContentTemplate="{StaticResource RemoteTestResultTemplate}" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock Margin="0,10,0,0" Style="{StaticResource CaptionText}" TextWrapping="Wrap"
+                                   Text="Verde indica sucesso, amarelo indica resposta válida que exige atenção e vermelho indica falha. Um HTTP 307 é tratado como redirecionamento, não como erro de autenticação." />
+                    </StackPanel>
+                </Border>
+
+                <Border Margin="0,0,0,14" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TitleMedium}" Text="Banco de dados local (SQLite)" />
+                        <TextBlock Margin="0,3,0,16"
+                                   Style="{StaticResource CaptionText}"
+                                   Text="Arquivo portátil usado pelo histórico e pelos dados locais da migração." />
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold" Text="Local do banco" />
+                                <TextBlock Style="{StaticResource CaptionText}" Text="A alteração é aplicada ao salvar" />
+                            </StackPanel>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding DatabasePath, UpdateSourceTrigger=LostFocus}" />
+                                <Button Grid.Column="1"
+                                        Margin="8,0,0,0"
+                                        Command="{Binding ChooseDatabaseFolderCommand}"
+                                        Content="Escolher pasta"
+                                        AutomationProperties.Name="Escolher pasta do banco SQLite" />
+                            </Grid>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="220" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold" Text="Concorrência" />
+                                <TextBlock Style="{StaticResource CaptionText}" Text="Recomendado para uso local" />
+                            </StackPanel>
+                            <CheckBox Grid.Column="1"
+                                      Content="Usar o modo WAL"
+                                      IsChecked="{Binding DatabaseUseWriteAheadLogging}" />
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Timeout de bloqueio (segundos)" />
+                                <TextBox Text="{Binding DatabaseBusyTimeoutSeconds, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Text="Arquivo em uso" />
+                        <TextBox IsReadOnly="True" Text="{Binding CurrentDatabasePath, Mode=OneWay}" />
+
+                        <Grid Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border Padding="10,7"
+                                    Background="{StaticResource ColorBrandBackgroundLight}"
+                                    CornerRadius="4">
+                                <TextBlock Text="{Binding DatabaseSummary}" TextWrapping="Wrap" />
+                            </Border>
+                            <Button Grid.Column="1"
+                                    Margin="8,0,0,0"
+                                    Command="{Binding OpenDatabaseFolderCommand}"
+                                    Content="Abrir pasta" />
+                            <Button Grid.Column="2"
+                                    Margin="8,0,0,0"
+                                    Command="{Binding VerifyDatabaseCommand}"
+                                    Content="Verificar" />
+                            <Button Grid.Column="3"
+                                    Margin="8,0,0,0"
+                                    Command="{Binding ExportDatabaseCommand}"
+                                    Content="Exportar cópia"
+                                    Style="{StaticResource PrimaryButton}" />
+                        </Grid>
+                        <TextBlock Margin="0,7,0,0"
+                                   Style="{StaticResource CaptionText}"
+                                   Text="Use Exportar cópia para gerar um arquivo consistente, inclusive quando WAL estiver ativo." />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TitleMedium}" Text="Armazenamento local" />
+                        <TextBlock Margin="0,8,0,4" FontWeight="SemiBold" Text="Arquivo de configurações" />
+                        <TextBox IsReadOnly="True" Text="{Binding StoragePath, Mode=OneWay}" />
+                        <TextBlock Margin="0,6,0,0"
+                                   Style="{StaticResource CaptionText}"
+                                   Text="Este arquivo é gravado em UTF-8 sem BOM. As chaves cadastradas em Configurações > Dynatrace e AppDynamics ficam nele em texto simples." />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Grid Grid.Row="2" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Border Padding="12,8" CornerRadius="6">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Background" Value="{StaticResource ColorBrandBackgroundLight}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasError}" Value="True">
+                                <Setter Property="Background" Value="{StaticResource ColorStatusDangerBackground}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" />
+            </Border>
+            <Button Grid.Column="1"
+                    Margin="12,0,8,0"
+                    Command="{Binding ResetCommand}"
+                    Content="Restaurar padrões" />
+            <Button Grid.Column="2"
+                    MinWidth="150"
+                    Command="{Binding SaveCommand}"
+                    Content="Salvar configurações"
+                    Style="{StaticResource PrimaryButton}" />
+        </Grid>
+    </Grid>
+</UserControl>

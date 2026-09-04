@@ -1,0 +1,114 @@
+{
+    "$schema":  "https://a2d.local/schemas/application-rules-v1.schema.json",
+    "schemaVersion":  "1.0",
+    "application":  {
+                        "id":  "sample-app-169",
+                        "name":  "Aplicação de Exemplo 169",
+                        "description":  "Aplicação sintética 169 para testes locais de migração",
+                        "owners":  [
+                                       "sre-team-01"
+                                   ],
+                        "labels":  {
+                                       "businessUnit":  "unit-9",
+                                       "environment":  "development"
+                                   }
+                    },
+    "defaults":  {
+                     "enabled":  true,
+                     "eventType":  "ERROR_EVENT",
+                     "alertGroup":  "sample-app-169",
+                     "profile":  {
+                                     "name":  "NOC - Equipe 01",
+                                     "severity":  "ERROR",
+                                     "delayMinutes":  0,
+                                     "tagFilters":  [
+                                                        "team:team-01"
+                                                    ]
+                                 },
+                     "schedule":  {
+                                      "mode":  "ACTIVE_WINDOW",
+                                      "timezone":  "America/Sao_Paulo",
+                                      "windows":  [
+                                                      {
+                                                          "days":  [
+                                                                       "MON",
+                                                                       "TUE",
+                                                                       "WED",
+                                                                       "THU",
+                                                                       "FRI"
+                                                                   ],
+                                                          "start":  "09:00",
+                                                          "end":  "18:00"
+                                                      }
+                                                  ]
+                                  }
+                 },
+    "rules":  [
+                  {
+                      "id":  "APPD-SAMPLE-169-ERROR",
+                      "name":  "Aplicação 169 - quantidade de erros",
+                      "groupId":  "sample-app-169-errors",
+                      "description":  "Quantidade de falhas acima do limite operacional",
+                      "targets":  [
+                                      {
+                                          "selectorType":  "NAME",
+                                          "value":  "sample-app-169-api"
+                                      },
+                                      {
+                                          "selectorType":  "NAME",
+                                          "value":  "sample-app-169-worker"
+                                      }
+                                  ],
+                      "signal":  {
+                                     "kind":  "METRIC",
+                                     "metricKey":  "dt.service.request.failure_count",
+                                     "aggregation":  "SUM"
+                                 },
+                      "detector":  {
+                                       "model":  "STATIC",
+                                       "condition":  "ABOVE",
+                                       "threshold":  14,
+                                       "violatingSamples":  3,
+                                       "slidingWindow":  5,
+                                       "dealertingSamples":  3,
+                                       "alertOnMissingData":  false
+                                   },
+                      "event":  {
+                                    "name":  "Aplicação 169 com erros acima do limite",
+                                    "description":  "Erros detectados nos serviços da aplicação 169."
+                                }
+                  },
+                  {
+                      "id":  "APPD-SAMPLE-169-LATENCY",
+                      "name":  "Aplicação 169 - anomalia de latência",
+                      "targets":  [
+                                      {
+                                          "selectorType":  "ENTITY_ID",
+                                          "value":  "SERVICE-00000000000000A9"
+                                      }
+                                  ],
+                      "signal":  {
+                                     "kind":  "METRIC",
+                                     "metricKey":  "dt.service.request.response_time",
+                                     "aggregation":  "AVG"
+                                 },
+                      "detector":  {
+                                       "model":  "AUTO_ADAPTIVE",
+                                       "condition":  "ABOVE",
+                                       "numberOfSignalFluctuations":  1,
+                                       "violatingSamples":  3,
+                                       "slidingWindow":  5,
+                                       "dealertingSamples":  5,
+                                       "alertOnMissingData":  false
+                                   },
+                      "event":  {
+                                    "name":  "Latência anormal na aplicação 169",
+                                    "type":  "PERFORMANCE_EVENT",
+                                    "alertGroup":  "sample-app-169"
+                                },
+                      "schedule":  {
+                                       "mode":  "ALWAYS"
+                                   }
+                  }
+              ]
+}

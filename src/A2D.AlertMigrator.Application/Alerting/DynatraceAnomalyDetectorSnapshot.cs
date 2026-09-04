@@ -1,0 +1,25 @@
+namespace A2D.AlertMigrator.Application.Alerting;
+
+public sealed record DynatraceAnomalyDetectorSnapshot(
+    string RemoteObjectId,
+    string SchemaId,
+    string SchemaVersion,
+    string Scope,
+    string Title,
+    string Description,
+    string SourceName,
+    bool Enabled,
+    string AnalyzerName,
+    string Model,
+    string Query,
+    bool UsesTimeseries,
+    string EventType,
+    string EventName,
+    string AlertGroup,
+    string Actor,
+    int AnalyzerInputCount,
+    int EventPropertyCount,
+    DateTimeOffset? RemoteCreatedAt,
+    DateTimeOffset? RemoteModifiedAt,
+    string ContentHash,
+    string RawJson);

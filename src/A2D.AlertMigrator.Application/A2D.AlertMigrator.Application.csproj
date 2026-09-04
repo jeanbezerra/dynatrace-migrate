@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\A2D.AlertMigrator.Domain\A2D.AlertMigrator.Domain.csproj" />
+  </ItemGroup>
+</Project>

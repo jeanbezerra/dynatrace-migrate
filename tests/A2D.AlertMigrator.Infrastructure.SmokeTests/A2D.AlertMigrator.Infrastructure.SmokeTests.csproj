@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\A2D.AlertMigrator.Infrastructure\A2D.AlertMigrator.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

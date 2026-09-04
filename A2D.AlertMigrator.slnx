@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/A2D.AlertMigrator.Domain/A2D.AlertMigrator.Domain.csproj" />
+    <Project Path="src/A2D.AlertMigrator.Application/A2D.AlertMigrator.Application.csproj" />
+    <Project Path="src/A2D.AlertMigrator.Infrastructure/A2D.AlertMigrator.Infrastructure.csproj" />
+    <Project Path="src/A2D.AlertMigrator.Desktop/A2D.AlertMigrator.Desktop.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/A2D.AlertMigrator.Infrastructure.SmokeTests/A2D.AlertMigrator.Infrastructure.SmokeTests.csproj" />
+    <Project Path="tests/A2D.AlertMigrator.Desktop.SmokeTests/A2D.AlertMigrator.Desktop.SmokeTests.csproj" />
+  </Folder>
+</Solution>
