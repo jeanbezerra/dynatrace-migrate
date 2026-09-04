@@ -1,0 +1,180 @@
+name: Publicar MSI
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag existente no formato vMAJOR.MINOR.PATCH'
+        required: true
+        type: string
+
+concurrency:
+  group: release-msi-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    name: Compilar, testar e assinar
+    runs-on: windows-latest
+    timeout-minutes: 30
+    environment: release
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.metadata.outputs.tag }}
+      version: ${{ steps.metadata.outputs.version }}
+      artifact_name: ${{ steps.metadata.outputs.artifact_name }}
+    steps:
+      - name: Obter o código da tag
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+
+      - name: Instalar o .NET 10
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Validar tag e versão
+        id: metadata
+        shell: pwsh
+        env:
+          REQUESTED_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          $tag = $env:REQUESTED_TAG
+          if ($tag -notmatch '^v(?<version>(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*))$') {
+            throw 'Use uma tag no formato vMAJOR.MINOR.PATCH, por exemplo v1.4.0.'
+          }
+
+          $tagCommit = (git rev-list -n 1 "refs/tags/$tag").Trim()
+          $headCommit = (git rev-parse HEAD).Trim()
+          if ([string]::IsNullOrWhiteSpace($tagCommit) -or $tagCommit -ne $headCommit) {
+            throw "A tag $tag não aponta para o commit obtido pelo workflow."
+          }
+
+          git merge-base --is-ancestor $headCommit "origin/$env:DEFAULT_BRANCH"
+          if ($LASTEXITCODE -ne 0) {
+            throw "A tag $tag precisa apontar para um commit da branch padrão $env:DEFAULT_BRANCH."
+          }
+
+          $version = $Matches.version
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "artifact_name=A2D.AlertMigrator-$version-win-x64" >> $env:GITHUB_OUTPUT
+
+      - name: Importar certificado de assinatura
+        id: certificate
+        shell: pwsh
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:CERTIFICATE_BASE64) -or
+              [string]::IsNullOrWhiteSpace($env:CERTIFICATE_PASSWORD)) {
+            throw 'Configure os secrets WINDOWS_SIGNING_CERTIFICATE_BASE64 e WINDOWS_SIGNING_CERTIFICATE_PASSWORD no environment release.'
+          }
+
+          $certificatePath = Join-Path $env:RUNNER_TEMP 'a2d-code-signing.pfx'
+          try {
+            $bytes = [Convert]::FromBase64String($env:CERTIFICATE_BASE64)
+            [IO.File]::WriteAllBytes($certificatePath, $bytes)
+            $password = ConvertTo-SecureString $env:CERTIFICATE_PASSWORD -AsPlainText -Force
+            $imported = @(Import-PfxCertificate `
+              -FilePath $certificatePath `
+              -CertStoreLocation 'Cert:\CurrentUser\My' `
+              -Password $password `
+              -Exportable:$false)
+
+            $codeSigningOid = '1.3.6.1.5.5.7.3.3'
+            $certificate = $imported |
+              Where-Object {
+                $_.HasPrivateKey -and
+                $_.EnhancedKeyUsageList.ObjectId.Value -contains $codeSigningOid
+              } |
+              Select-Object -First 1
+
+            if ($null -eq $certificate) {
+              throw 'O PFX não contém um certificado Code Signing com chave privada.'
+            }
+
+            "thumbprint=$($certificate.Thumbprint)" >> $env:GITHUB_OUTPUT
+          }
+          finally {
+            if (Test-Path -LiteralPath $certificatePath) {
+              Remove-Item -LiteralPath $certificatePath -Force
+            }
+          }
+
+      - name: Gerar e assinar o MSI
+        shell: pwsh
+        env:
+          TIMESTAMP_URL: ${{ vars.WINDOWS_TIMESTAMP_URL || 'http://timestamp.digicert.com' }}
+        run: |
+          ./scripts/build-release-msi.ps1 `
+            -Version '${{ steps.metadata.outputs.version }}' `
+            -CertificateThumbprint '${{ steps.certificate.outputs.thumbprint }}' `
+            -TimestampUrl $env:TIMESTAMP_URL
+
+      - name: Remover certificado do runner
+        if: always() && steps.certificate.outputs.thumbprint != ''
+        shell: pwsh
+        run: |
+          $path = 'Cert:\CurrentUser\My\${{ steps.certificate.outputs.thumbprint }}'
+          if (Test-Path -LiteralPath $path) {
+            Remove-Item -LiteralPath $path -Force
+          }
+
+      - name: Guardar artefatos da execução
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: ${{ steps.metadata.outputs.artifact_name }}
+          path: |
+            artifacts/releases/${{ steps.metadata.outputs.version }}/*.msi
+            artifacts/releases/${{ steps.metadata.outputs.version }}/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    name: Publicar no GitHub Release
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Baixar MSI assinado
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: ${{ needs.package.outputs.artifact_name }}
+          path: release-assets
+
+      - name: Criar ou atualizar o release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.package.outputs.tag }}
+          RELEASE_VERSION: ${{ needs.package.outputs.version }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          assets=(release-assets/*.msi release-assets/*.sha256)
+          if (( ${#assets[@]} != 2 )); then
+            echo 'O MSI e o checksum SHA-256 não foram encontrados.' >&2
+            exit 1
+          fi
+
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$RELEASE_TAG" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" \
+              --verify-tag \
+              --generate-notes \
+              --title "A2D Alert Migrator $RELEASE_VERSION"
+          fi

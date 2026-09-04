@@ -2,7 +2,9 @@
 
 ## Usuário do aplicativo
 
-O pacote final `win-x64` será autocontido: basta descompactar em uma pasta local e executar. Não será necessário instalar .NET nem SQLite.
+Baixe o MSI assinado no GitHub Release e execute-o. O pacote é autocontido,
+instala em `Program Files` e solicita permissão de administrador. Não é
+necessário instalar .NET nem SQLite.
 
 > Não execute o banco diretamente no Google Drive. Use **Exportar projeto** para gerar o pacote compartilhável.
 
@@ -40,6 +42,9 @@ Para gerar o executável autocontido:
 ```powershell
 ./scripts/publish-win-x64.ps1
 ```
+
+O processo de release e os segredos exigidos estão em
+[`RELEASES.md`](RELEASES.md).
 
 Para distribuir em máquinas com App Control corporativo, publique com o
 certificado Code Signing autorizado pela empresa. O procedimento está em

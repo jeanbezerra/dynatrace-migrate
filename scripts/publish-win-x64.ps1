@@ -12,6 +12,8 @@ param(
 
     [string]$TimestampUrl,
 
+    [string]$Version,
+
     [switch]$RequireSignature
 )
 
@@ -43,8 +45,21 @@ $publishArguments = @(
     '--tl:off'
     '-p:PublishSingleFile=true'
     '-p:IncludeNativeLibrariesForSelfExtract=true'
+    '-p:ContinuousIntegrationBuild=true'
     '--output', $OutputPath
 )
+
+if (-not [string]::IsNullOrWhiteSpace($Version)) {
+    if ($Version -notmatch '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$') {
+        throw 'A versão deve usar o formato numérico MAJOR.MINOR.PATCH.'
+    }
+
+    $publishArguments += @(
+        "-p:Version=$Version"
+        "-p:AssemblyVersion=$Version.0"
+        "-p:FileVersion=$Version.0"
+    )
+}
 
 & $dotnetCommand.Source @publishArguments
 if ($LASTEXITCODE -ne 0) {

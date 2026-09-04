@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Name="A2D Alert Migrator"
+    Manufacturer="A2D"
+    Version="$(var.ProductVersion)"
+    UpgradeCode="{F2E731F9-4213-4EA0-B2C9-9F36DDC6AC5B}"
+    Scope="perMachine"
+    Compressed="yes">
+
+    <MajorUpgrade DowngradeErrorMessage="Já existe uma versão mais recente do A2D Alert Migrator instalada." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Icon Id="A2D.AlertMigrator.exe" SourceFile="$(var.PublishDir)\A2D.AlertMigrator.exe" />
+    <Property Id="ARPPRODUCTICON" Value="A2D.AlertMigrator.exe" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/jeanbezerra/dynatrace-migrate/issues" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/jeanbezerra/dynatrace-migrate" />
+
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="A2D Alert Migrator">
+        <Component Id="ApplicationExecutable">
+          <File
+            Id="MainExecutable"
+            Source="$(var.PublishDir)\A2D.AlertMigrator.exe"
+            KeyPath="yes">
+            <Shortcut
+              Id="StartMenuShortcut"
+              Directory="ApplicationProgramsFolder"
+              Name="A2D Alert Migrator"
+              Description="Migração de alertas do AppDynamics para o Dynatrace"
+              WorkingDirectory="INSTALLFOLDER"
+              Advertise="yes" />
+          </File>
+          <RemoveFolder Id="RemoveApplicationProgramsFolder" Directory="ApplicationProgramsFolder" On="uninstall" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="A2D Alert Migrator" />
+    </StandardDirectory>
+
+    <Feature Id="MainFeature" Title="A2D Alert Migrator" Level="1">
+      <ComponentRef Id="ApplicationExecutable" />
+    </Feature>
+  </Package>
+</Wix>

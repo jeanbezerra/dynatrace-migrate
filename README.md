@@ -64,9 +64,12 @@ O contrato v2 e o fluxo planejado para correlacionar Business Transactions,
 serviços, endpoints, Key Requests, schedules e publicação faseada estão em
 [`docs/MIGRATION-FLOW.md`](docs/MIGRATION-FLOW.md).
 
-Em ambientes com Windows App Control, distribua somente o pacote de arquivo
-único assinado por um publicador autorizado. Consulte o guia de
+Em ambientes com Windows App Control, distribua somente o executável e o MSI
+assinados por um publicador autorizado. Consulte o guia de
 [assinatura e liberação](docs/CODE-SIGNING.md).
+
+Releases oficiais são publicados como MSI assinado, com checksum SHA-256. Veja
+o processo em [`docs/RELEASES.md`](docs/RELEASES.md).
 
 ## Abrir a tela
 

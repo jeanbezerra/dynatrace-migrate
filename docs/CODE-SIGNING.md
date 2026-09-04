@@ -1,7 +1,10 @@
 # Assinatura e liberação no Windows
 
-O aplicativo deve ser distribuído como o executável único gerado em
-`artifacts/A2D.AlertMigrator-win-x64`. O script de execução já usa esse formato.
+Releases oficiais são gerados como MSI pelo GitHub Actions. A configuração e o
+comando de publicação estão em [`RELEASES.md`](RELEASES.md).
+
+Para execução local, o aplicativo também pode ser distribuído como o executável
+único gerado em `artifacts/A2D.AlertMigrator-win-x64`.
 
 ## Publicação corporativa
 
