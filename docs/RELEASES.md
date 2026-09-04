@@ -8,7 +8,7 @@ O workflow [`release-exe.yml`](../.github/workflows/release-exe.yml) executa a
 cada push na `master` ou manualmente. Ele publica somente o executável
 autocontido em dois canais:
 
-- `exe-v1.0.N`, release histórica cuja versão usa o número da execução;
+- `0.0.N-alpha`, release histórica cuja versão usa o número da execução;
 - `exe-latest`, release móvel que sempre aponta para o último executável.
 
 Cada release desse workflow contém um único arquivo `.exe`. O canal incremental
@@ -63,6 +63,9 @@ Para o executável, integre o commit na `master` ou execute **Publicar EXE** em
 **Actions > Run workflow**. Não é necessário criar uma tag: o próprio workflow
 usa `github.run_number` para gerar a próxima versão. Uma nova execução normal
 gera uma nova versão; repetir a mesma execução atualiza a release correspondente.
+Enquanto o projeto estiver em estágio alpha, a sequência será `0.0.1-alpha`,
+`0.0.2-alpha`, `0.0.3-alpha` e assim por diante. A tag e o título da release
+contêm somente esse identificador de versão.
 
 Sem os dois secrets de assinatura, o workflow entra automaticamente no modo
 gratuito e publica o EXE sem Authenticode. A release e o resumo da execução

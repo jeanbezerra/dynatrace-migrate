@@ -46,18 +46,20 @@ $publishArguments = @(
     '-p:PublishSingleFile=true'
     '-p:IncludeNativeLibrariesForSelfExtract=true'
     '-p:ContinuousIntegrationBuild=true'
+    '-p:IncludeSourceRevisionInInformationalVersion=false'
     '--output', $OutputPath
 )
 
 if (-not [string]::IsNullOrWhiteSpace($Version)) {
-    if ($Version -notmatch '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$') {
-        throw 'A versão deve usar o formato numérico MAJOR.MINOR.PATCH.'
+    if ($Version -notmatch '^(?<NumericVersion>(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*))(?<Suffix>-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?$') {
+        throw 'A versão deve usar MAJOR.MINOR.PATCH e pode ter um sufixo SemVer, como 0.0.1-alpha.'
     }
 
+    $numericVersion = $Matches.NumericVersion
     $publishArguments += @(
         "-p:Version=$Version"
-        "-p:AssemblyVersion=$Version.0"
-        "-p:FileVersion=$Version.0"
+        "-p:AssemblyVersion=$numericVersion.0"
+        "-p:FileVersion=$numericVersion.0"
     )
 }
 

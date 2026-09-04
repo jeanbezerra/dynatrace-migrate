@@ -41,10 +41,10 @@ jobs:
             throw "O número da execução $patch não cabe na versão de arquivo do Windows."
           }
 
-          $version = "1.0.$patch"
+          $version = "0.0.$patch-alpha"
           $executableName = "A2D.AlertMigrator-$version-win-x64.exe"
           "version=$version" >> $env:GITHUB_OUTPUT
-          "version_tag=exe-v$version" >> $env:GITHUB_OUTPUT
+          "version_tag=$version" >> $env:GITHUB_OUTPUT
           "artifact_name=A2D.AlertMigrator-$version-win-x64" >> $env:GITHUB_OUTPUT
           "executable_name=$executableName" >> $env:GITHUB_OUTPUT
 
@@ -218,7 +218,7 @@ jobs:
               --repo "$GITHUB_REPOSITORY" \
               --target "$GITHUB_SHA" \
               --notes "$signature_note" \
-              --title "A2D Alert Migrator $VERSION"
+              --title "$VERSION"
           fi
 
   release_latest:
