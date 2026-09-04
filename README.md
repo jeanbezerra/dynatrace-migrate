@@ -60,6 +60,10 @@ samples/
 Consulte a [arquitetura SOLID](docs/ARCHITECTURE.md) e a
 [preparação da máquina](docs/SETUP.md).
 
+O contrato v2 e o fluxo planejado para correlacionar Business Transactions,
+serviços, endpoints, Key Requests, schedules e publicação faseada estão em
+[`docs/MIGRATION-FLOW.md`](docs/MIGRATION-FLOW.md).
+
 Em ambientes com Windows App Control, distribua somente o pacote de arquivo
 único assinado por um publicador autorizado. Consulte o guia de
 [assinatura e liberação](docs/CODE-SIGNING.md).
