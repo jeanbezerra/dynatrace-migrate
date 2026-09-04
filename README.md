@@ -71,6 +71,10 @@ assinados por um publicador autorizado. Consulte o guia de
 Releases oficiais são publicados como MSI assinado, com checksum SHA-256. Veja
 o processo em [`docs/RELEASES.md`](docs/RELEASES.md).
 
+Para distribuição pela Microsoft Store, use o fluxo MSIX separado em
+[`docs/MICROSOFT-STORE.md`](docs/MICROSOFT-STORE.md); a Store reassina o pacote
+após a certificação.
+
 ## Abrir a tela
 
 ```powershell

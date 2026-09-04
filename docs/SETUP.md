@@ -16,6 +16,10 @@ Instale:
 2. [.NET 10 SDK para Windows x64](https://dotnet.microsoft.com/download/dotnet/10.0) — selecione **SDK > Windows > x64**.
 3. Opcional: [Visual Studio Community 2026](https://visualstudio.microsoft.com/downloads/) com a carga **Desenvolvimento para desktop com .NET**.
 
+Para gerar MSIX para a Microsoft Store, adicione o componente opcional
+**MSIX Packaging Tools** ao Visual Studio e siga
+[`MICROSOFT-STORE.md`](MICROSOFT-STORE.md).
+
 O SQLite é incorporado pelo pacote `Microsoft.Data.Sqlite`; não instale servidor
 ou ferramenta separada.
 O HTTP Client resiliente usa `Microsoft.Extensions.Http.Resilience`; ele também

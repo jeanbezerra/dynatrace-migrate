@@ -4,6 +4,15 @@ O workflow [`release-msi.yml`](../.github/workflows/release-msi.yml) compila,
 executa os smoke tests, publica o aplicativo `win-x64` autocontido, assina o
 executável e o MSI, gera SHA-256 e anexa os arquivos ao GitHub Release.
 
+| Canal | Pacote | Assinatura final |
+|---|---|---|
+| GitHub Release ou distribuição corporativa | MSI | Certificado Code Signing do projeto |
+| Microsoft Store | MSIX | Microsoft Store após a certificação |
+
+O procedimento da Store está em
+[`MICROSOFT-STORE.md`](MICROSOFT-STORE.md). A reassinatura da Store não se
+aplica ao MSI deste workflow nem a MSIX distribuído por sideload.
+
 ## Configuração única no GitHub
 
 Em **Settings > Environments**, crie o ambiente `release` e, de preferência,
