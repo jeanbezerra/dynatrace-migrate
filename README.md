@@ -68,8 +68,9 @@ Em ambientes com Windows App Control, distribua somente o executável e o MSI
 assinados por um publicador autorizado. Consulte o guia de
 [assinatura e liberação](docs/CODE-SIGNING.md).
 
-Releases oficiais são publicados como MSI assinado, com checksum SHA-256. Veja
-o processo em [`docs/RELEASES.md`](docs/RELEASES.md).
+Releases oficiais são publicadas como MSI assinado ou como EXE autocontido nos
+canais incremental e `exe-latest`. Veja o processo em
+[`docs/RELEASES.md`](docs/RELEASES.md).
 
 Para distribuição pela Microsoft Store, use o fluxo MSIX separado em
 [`docs/MICROSOFT-STORE.md`](docs/MICROSOFT-STORE.md); a Store reassina o pacote

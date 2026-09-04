@@ -44,10 +44,18 @@ máquina de teste. Ele não é o certificado entregue aos usuários da Store.
 1. No Partner Center, crie uma submissão e envie o `.msixupload` em
    **Packages**.
 2. Preencha preço e disponibilidade, propriedades, classificação etária,
-   listagem, política de privacidade, suporte e notas para certificação.
+   listagem, suporte e notas para certificação. Em política de privacidade,
+   selecione **Fornecer o texto da política de privacidade** e cole o conteúdo
+   de [`PRIVACY-POLICY.md`](PRIVACY-POLICY.md). Não é necessário publicar uma
+   URL enquanto essa opção estiver disponível no Partner Center.
 3. Selecione publicação imediata, agendada ou manual e envie para certificação.
 4. Após a aprovação, confirme que o pacote publicado aparece assinado pela
    Microsoft e instale-o diretamente pela Store para o teste final.
+
+Antes de enviar, confirme se o nome do publicador e o canal de suporte estão
+corretos. A política foi escrita conforme o funcionamento atual do aplicativo e
+deve ser revisada novamente se houver mudança na coleta, no armazenamento ou no
+compartilhamento de dados.
 
 Não publique o `.msixupload` como instalador no GitHub Releases. Ele é um
 artefato de submissão; o pacote confiável para usuários é o disponibilizado pela
@@ -57,4 +65,6 @@ Referências: [publicar uma aplicação Windows](https://learn.microsoft.com/win
 [requisitos do pacote](https://learn.microsoft.com/windows/apps/publish/publish-your-app/msix/app-package-requirements),
 [empacotar WPF com MSIX](https://learn.microsoft.com/windows/apps/desktop/modernize/dotnet/package-app),
 [enviar pacotes](https://learn.microsoft.com/windows/apps/publish/publish-your-app/msix/upload-app-packages)
-e [processo de certificação](https://learn.microsoft.com/windows/apps/publish/publish-your-app/msix/app-certification-process).
+e [processo de certificação](https://learn.microsoft.com/windows/apps/publish/publish-your-app/msix/app-certification-process),
+[política de privacidade e suporte](https://learn.microsoft.com/windows/apps/publish/publish-your-app/msix/support-info)
+e [Políticas da Microsoft Store](https://learn.microsoft.com/windows/apps/publish/store-policies).

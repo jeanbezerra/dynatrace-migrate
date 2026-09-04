@@ -1,0 +1,255 @@
+name: Publicar EXE
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  package:
+    name: Compilar, testar e assinar
+    runs-on: windows-latest
+    timeout-minutes: 30
+    environment: release
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+      version_tag: ${{ steps.metadata.outputs.version_tag }}
+      artifact_name: ${{ steps.metadata.outputs.artifact_name }}
+      executable_name: ${{ steps.metadata.outputs.executable_name }}
+    steps:
+      - name: Obter o código
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Instalar o .NET 10
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Definir a versão incremental
+        id: metadata
+        shell: pwsh
+        run: |
+          $patch = [int64]$env:GITHUB_RUN_NUMBER
+          if ($patch -lt 1 -or $patch -gt 65535) {
+            throw "O número da execução $patch não cabe na versão de arquivo do Windows."
+          }
+
+          $version = "1.0.$patch"
+          $executableName = "A2D.AlertMigrator-$version-win-x64.exe"
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "version_tag=exe-v$version" >> $env:GITHUB_OUTPUT
+          "artifact_name=A2D.AlertMigrator-$version-win-x64" >> $env:GITHUB_OUTPUT
+          "executable_name=$executableName" >> $env:GITHUB_OUTPUT
+
+      - name: Compilar a solução
+        shell: pwsh
+        run: |
+          dotnet build A2D.AlertMigrator.slnx `
+            --configuration Release `
+            --nologo `
+            --tl:off `
+            -p:Version='${{ steps.metadata.outputs.version }}' `
+            -p:ContinuousIntegrationBuild=true
+
+      - name: Executar os testes de infraestrutura
+        shell: pwsh
+        run: |
+          dotnet run `
+            --project tests/A2D.AlertMigrator.Infrastructure.SmokeTests/A2D.AlertMigrator.Infrastructure.SmokeTests.csproj `
+            --configuration Release `
+            --no-build `
+            -- '${{ github.workspace }}'
+
+      - name: Executar os testes da aplicação desktop
+        shell: pwsh
+        run: |
+          dotnet run `
+            --project tests/A2D.AlertMigrator.Desktop.SmokeTests/A2D.AlertMigrator.Desktop.SmokeTests.csproj `
+            --configuration Release `
+            --no-build
+
+      - name: Importar certificado de assinatura
+        id: certificate
+        shell: pwsh
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:CERTIFICATE_BASE64) -or
+              [string]::IsNullOrWhiteSpace($env:CERTIFICATE_PASSWORD)) {
+            throw 'Configure os secrets WINDOWS_SIGNING_CERTIFICATE_BASE64 e WINDOWS_SIGNING_CERTIFICATE_PASSWORD no environment release.'
+          }
+
+          $certificatePath = Join-Path $env:RUNNER_TEMP 'a2d-code-signing.pfx'
+          try {
+            $bytes = [Convert]::FromBase64String($env:CERTIFICATE_BASE64)
+            [IO.File]::WriteAllBytes($certificatePath, $bytes)
+            $password = ConvertTo-SecureString $env:CERTIFICATE_PASSWORD -AsPlainText -Force
+            $imported = @(Import-PfxCertificate `
+              -FilePath $certificatePath `
+              -CertStoreLocation 'Cert:\CurrentUser\My' `
+              -Password $password `
+              -Exportable:$false)
+
+            $codeSigningOid = '1.3.6.1.5.5.7.3.3'
+            $certificate = $imported |
+              Where-Object {
+                $_.HasPrivateKey -and
+                $_.EnhancedKeyUsageList.ObjectId.Value -contains $codeSigningOid
+              } |
+              Select-Object -First 1
+
+            if ($null -eq $certificate) {
+              throw 'O PFX não contém um certificado Code Signing com chave privada.'
+            }
+
+            "thumbprint=$($certificate.Thumbprint)" >> $env:GITHUB_OUTPUT
+          }
+          finally {
+            if (Test-Path -LiteralPath $certificatePath) {
+              Remove-Item -LiteralPath $certificatePath -Force
+            }
+          }
+
+      - name: Publicar e assinar o executável
+        shell: pwsh
+        env:
+          TIMESTAMP_URL: ${{ vars.WINDOWS_TIMESTAMP_URL || 'http://timestamp.digicert.com' }}
+        run: |
+          $publishPath = Join-Path '${{ runner.temp }}' 'a2d-exe-publish'
+          ./scripts/publish-win-x64.ps1 `
+            -Configuration Release `
+            -OutputPath $publishPath `
+            -Version '${{ steps.metadata.outputs.version }}' `
+            -CertificateThumbprint '${{ steps.certificate.outputs.thumbprint }}' `
+            -TimestampUrl $env:TIMESTAMP_URL `
+            -RequireSignature
+
+          $releasePath = Join-Path '${{ runner.temp }}' 'a2d-exe-release'
+          New-Item -ItemType Directory -Path $releasePath -Force | Out-Null
+          Copy-Item `
+            -LiteralPath (Join-Path $publishPath 'A2D.AlertMigrator.exe') `
+            -Destination (Join-Path $releasePath '${{ steps.metadata.outputs.executable_name }}') `
+            -Force
+
+      - name: Remover certificado do runner
+        if: always() && steps.certificate.outputs.thumbprint != ''
+        shell: pwsh
+        run: |
+          $path = 'Cert:\CurrentUser\My\${{ steps.certificate.outputs.thumbprint }}'
+          if (Test-Path -LiteralPath $path) {
+            Remove-Item -LiteralPath $path -Force
+          }
+
+      - name: Guardar o executável da execução
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: ${{ steps.metadata.outputs.artifact_name }}
+          path: ${{ runner.temp }}/a2d-exe-release/${{ steps.metadata.outputs.executable_name }}
+          if-no-files-found: error
+          retention-days: 14
+
+  release_version:
+    name: Publicar versão incremental
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Baixar o executável assinado
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: ${{ needs.package.outputs.artifact_name }}
+          path: release-assets
+
+      - name: Publicar a versão incremental
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.package.outputs.version }}
+          VERSION_TAG: ${{ needs.package.outputs.version_tag }}
+          EXECUTABLE_NAME: ${{ needs.package.outputs.executable_name }}
+        run: |
+          set -euo pipefail
+          asset="release-assets/$EXECUTABLE_NAME"
+          test -f "$asset"
+
+          if gh release view "$VERSION_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$VERSION_TAG" "$asset" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$VERSION_TAG" "$asset" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --generate-notes \
+              --title "A2D Alert Migrator $VERSION"
+          fi
+
+  release_latest:
+    name: Atualizar versão latest
+    needs:
+      - package
+      - release_version
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: release-exe-latest
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - name: Baixar o executável assinado
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: ${{ needs.package.outputs.artifact_name }}
+          path: release-assets
+
+      - name: Atualizar a versão latest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.package.outputs.version }}
+          VERSION_TAG: ${{ needs.package.outputs.version_tag }}
+          EXECUTABLE_NAME: ${{ needs.package.outputs.executable_name }}
+        run: |
+          set -euo pipefail
+          source_asset="release-assets/$EXECUTABLE_NAME"
+          latest_asset='release-assets/A2D.AlertMigrator-latest-win-x64.exe'
+          cp "$source_asset" "$latest_asset"
+
+          notes="Executável mais recente. Versão atual: [$VERSION](https://github.com/$GITHUB_REPOSITORY/releases/tag/$VERSION_TAG)."
+
+          if gh release view exe-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/exe-latest" >/dev/null 2>&1; then
+              gh api \
+                --method PATCH \
+                "repos/$GITHUB_REPOSITORY/git/refs/tags/exe-latest" \
+                -f sha="$GITHUB_SHA" \
+                -F force=true >/dev/null
+            else
+              gh api \
+                --method POST \
+                "repos/$GITHUB_REPOSITORY/git/refs" \
+                -f ref='refs/tags/exe-latest' \
+                -f sha="$GITHUB_SHA" >/dev/null
+            fi
+            gh release upload exe-latest "$latest_asset" --clobber --repo "$GITHUB_REPOSITORY"
+            gh release edit exe-latest \
+              --repo "$GITHUB_REPOSITORY" \
+              --title 'A2D Alert Migrator — latest' \
+              --notes "$notes" \
+              --latest
+          else
+            gh release create exe-latest "$latest_asset" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title 'A2D Alert Migrator — latest' \
+              --notes "$notes" \
+              --latest
+          fi

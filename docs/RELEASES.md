@@ -1,12 +1,24 @@
-# Releases MSI
+# Releases
 
 O workflow [`release-msi.yml`](../.github/workflows/release-msi.yml) compila,
 executa os smoke tests, publica o aplicativo `win-x64` autocontido, assina o
 executável e o MSI, gera SHA-256 e anexa os arquivos ao GitHub Release.
 
+O workflow [`release-exe.yml`](../.github/workflows/release-exe.yml) executa a
+cada push na `master` ou manualmente. Ele publica somente o executável
+autocontido e assinado em dois canais:
+
+- `exe-v1.0.N`, release histórica cuja versão usa o número da execução;
+- `exe-latest`, release móvel que sempre aponta para o último executável.
+
+Cada release desse workflow contém um único arquivo `.exe`. O canal incremental
+preserva o nome versionado, enquanto o canal móvel usa
+`A2D.AlertMigrator-latest-win-x64.exe`.
+
 | Canal | Pacote | Assinatura final |
 |---|---|---|
 | GitHub Release ou distribuição corporativa | MSI | Certificado Code Signing do projeto |
+| GitHub Release incremental ou `exe-latest` | EXE autocontido | Certificado Code Signing do projeto |
 | Microsoft Store | MSIX | Microsoft Store após a certificação |
 
 O procedimento da Store está em
@@ -46,6 +58,11 @@ git push origin v1.0.0
 Também é possível executar **Publicar MSI** manualmente e informar uma tag já
 existente. Tags fora do formato `vMAJOR.MINOR.PATCH`, testes com falha ou
 assinaturas inválidas impedem a publicação.
+
+Para o executável, integre o commit na `master` ou execute **Publicar EXE** em
+**Actions > Run workflow**. Não é necessário criar uma tag: o próprio workflow
+usa `github.run_number` para gerar a próxima versão. Uma nova execução normal
+gera uma nova versão; repetir a mesma execução atualiza a release correspondente.
 
 O empacotamento usa WiX 5.0.2 fixado no projeto. WiX 6 e 7 adotam a
 [Open Source Maintenance Fee](https://docs.firegiant.com/wix/osmf/); uma futura
